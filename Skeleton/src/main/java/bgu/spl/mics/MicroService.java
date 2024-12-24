@@ -1,5 +1,8 @@
 package bgu.spl.mics;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * The MicroService is an abstract class that any micro-service in the system
  * must extend. The abstract MicroService class is responsible to get and
@@ -22,6 +25,7 @@ public abstract class MicroService implements Runnable {
 
     private boolean terminated = false;
     private final String name;
+    private ConcurrentHashMap<Class<? extends Message>, Callback<?>> messageCallBack = new ConcurrentHashMap<>();
 
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
@@ -53,8 +57,13 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
-        //TODO: implement this.
-    }
+    // Register the callback for the given event type
+    messageCallBack.put(type, callback);
+
+    // Register this microservice's subscription with the singleton MessageBus
+    MessageBusImpl.getInstance().subscribeEvent(type, this);
+}
+        
 
     /**
      * Subscribes to broadcast message of type {@code type} with the callback
@@ -77,8 +86,12 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <B extends Broadcast> void subscribeBroadcast(Class<B> type, Callback<B> callback) {
-        //TODO: implement this.
-    }
+            // Register the callback for the given event type
+        messageCallBack.put(type, callback);
+
+    // Register this microservice's subscription with the singleton MessageBus
+    MessageBusImpl.getInstance().subscribeBroadcast(type, this);
+        }
 
     /**
      * Sends the event {@code e} using the message-bus and receive a {@link Future<T>}
@@ -93,8 +106,7 @@ public abstract class MicroService implements Runnable {
      * 	       			null in case no micro-service has subscribed to {@code e.getClass()}.
      */
     protected final <T> Future<T> sendEvent(Event<T> e) {
-        //TODO: implement this.
-        return null; //TODO: delete this line :)
+        return MessageBusImpl.getInstance().sendEvent(e);
     }
 
     /**
@@ -104,7 +116,7 @@ public abstract class MicroService implements Runnable {
      * @param b The broadcast message to send
      */
     protected final void sendBroadcast(Broadcast b) {
-        //TODO: implement this.
+        MessageBusImpl.getInstance().sendBroadcast(b);
     }
 
     /**
@@ -118,7 +130,7 @@ public abstract class MicroService implements Runnable {
      *               {@code e}.
      */
     protected final <T> void complete(Event<T> e, T result) {
-        //TODO: implement this.
+        MessageBusImpl.getInstance().complete(e, result);
     }
 
     /**
@@ -141,6 +153,15 @@ public abstract class MicroService implements Runnable {
     public final String getName() {
         return name;
     }
+    @SuppressWarnings("unchecked")
+    private <T> void handleMessage(Message message) {
+        Callback<T> callback = (Callback<T>) messageCallBack.get(message.getClass());
+        if (callback != null) {
+            callback.call((T) message); // Execute the callback
+        } else {
+            throw new IllegalStateException("No callback found for message type: " + message.getClass());
+        }
+    }
 
     /**
      * The entry point of the micro-service. TODO: you must complete this code
@@ -149,9 +170,14 @@ public abstract class MicroService implements Runnable {
     @Override
     public final void run() {
         initialize();
-        while (!terminated) {
-            System.out.println("NOT IMPLEMENTED!!!"); //TODO: you should delete this line :)
+        MessageBusImpl.getInstance().register(this);
+        try {
+            while (!terminated) {
+                Message msg = MessageBusImpl.getInstance().awaitMessage(this);
+                this.handleMessage(msg);     
+             }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
-
 }

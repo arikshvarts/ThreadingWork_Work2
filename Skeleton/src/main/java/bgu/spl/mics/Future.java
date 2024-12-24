@@ -69,20 +69,22 @@ public class Future<T> {
     public synchronized T get(long timeout, TimeUnit unit) {
         long millisTimeout = unit.toMillis(timeout); // Convert timeout to milliseconds
         long endTime = System.currentTimeMillis() + millisTimeout; // Calculate end time
-        try{
         while (!isDone) {
             long remainingTime = endTime - System.currentTimeMillis();
             if (remainingTime <= 0) {
                 return null; // Timeout has elapsed
             }
-            Thread.sleep(remainingTime); // Wait for the remaining time or until notified
+            try{
+            wait(remainingTime); // Wait for the remaining time or until notified
         }
-    } catch (InterruptedException e) {
+    catch (InterruptedException e) {
         Thread.currentThread().interrupt();
         System.out.println("Error: Future.get() was interrupted."); 
         }
+        }
         return result;
 }
+
 }
 
 
