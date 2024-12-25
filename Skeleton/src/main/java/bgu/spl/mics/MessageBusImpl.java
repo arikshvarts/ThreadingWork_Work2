@@ -13,7 +13,7 @@ public class MessageBusImpl implements MessageBus {
     private ConcurrentHashMap<Class<? extends Broadcast>, ArrayList<MicroService>> broadcast_Subscribers = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Class<? extends Event>, BlockingQueue<MicroService>> event_Subscribers = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<Event<?>, Future<?>> FutureToEvent = new ConcurrentHashMap<>();
-
+    private Object object = new Object();
     // Private constructor to ensure class is a singleton
     private MessageBusImpl() {}
 
@@ -65,17 +65,19 @@ public class MessageBusImpl implements MessageBus {
 
     @Override
     public void sendBroadcast(Broadcast b) {
-		if(broadcast_Subscribers.containsKey(b.getClass()) == true){
-			for(MicroService m : broadcast_Subscribers.get(b.getClass())){
-				MicroServices_Queues.get(m).add(b);
-			}
-		}
+        synchronized (object) {
+            if (broadcast_Subscribers.containsKey(b.getClass()) == true) {
+                for (MicroService m : broadcast_Subscribers.get(b.getClass())) {
+                    MicroServices_Queues.get(m).add(b);
+                }
+            }
+        }
     }
 
     @Override
 public synchronized <T> Future<T> sendEvent(Event<T> event) {
     Class<? extends Event> eventType = event.getClass(); // Get the event type
-
+    synchronized(object){
     // Fetch the queue of subscribers for this event type
     BlockingQueue<MicroService> subscribers = event_Subscribers.get(event);        
     // If no subscribers are registered, return null
@@ -101,7 +103,7 @@ public synchronized <T> Future<T> sendEvent(Event<T> event) {
 
             return future; // Return the Future to the sender
         }
-
+    }
     return null; // Return null if something went wrong
 }
 
@@ -115,6 +117,7 @@ public synchronized <T> Future<T> sendEvent(Event<T> event) {
 
     @Override
     public synchronized void unregister(MicroService m) {
+        synchronized (object) {
 		MicroServices_Queues.remove(m);
 		for (ArrayList<MicroService> ls : broadcast_Subscribers.values()) {
 			if(ls.contains(m))
@@ -124,6 +127,7 @@ public synchronized <T> Future<T> sendEvent(Event<T> event) {
 			if(ls.contains(m))
 			ls.remove(m);
 		}	
+    }
 }
 
 

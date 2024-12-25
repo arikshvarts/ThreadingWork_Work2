@@ -5,7 +5,7 @@ package bgu.spl.mics.application.objects;
  * It provides access to cloud point data and other relevant information for tracked objects.
  */
 public class LiDarDataBase {
-
+    List<StampedCloudPoints> cloudPoints = new ArrayList<>();
     /**
      * Returns the singleton instance of LiDarDataBase.
      *
@@ -13,7 +13,6 @@ public class LiDarDataBase {
      * @return The singleton instance of LiDarDataBase.
      */
     public static LiDarDataBase getInstance(String filePath) {
-        // TODO: Implement this
-        return null;
+        return cloudPoints;
     }
 }
