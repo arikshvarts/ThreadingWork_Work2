@@ -8,6 +8,6 @@ package bgu.spl.mics.application.objects;
 public class FusionSlam {
     // Singleton instance holder
     private static class FusionSlamHolder {
-        // TODO: Implement singleton instance logic.
+//implement later look at the appendix.
     }
 }
