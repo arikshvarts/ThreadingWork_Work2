@@ -57,6 +57,9 @@ public class MessageBusImpl implements MessageBus {
     @Override
     public <T> void complete(Event<T> e, T result) {	
 		Future<T> future = (Future<T>) FutureToEvent.get(e);
+        if(future == null){
+            throw new IllegalStateException("This event is not registered");  
+        }
 		future.resolve(result);
     }
 
@@ -70,19 +73,17 @@ public class MessageBusImpl implements MessageBus {
     }
 
     @Override
-public  <T> Future<T> sendEvent(Event<T> event) {
+public synchronized <T> Future<T> sendEvent(Event<T> event) {
     Class<? extends Event> eventType = event.getClass(); // Get the event type
 
     // Fetch the queue of subscribers for this event type
-    BlockingQueue<MicroService> subscribers = event_Subscribers.get(event);
-
+    BlockingQueue<MicroService> subscribers = event_Subscribers.get(event);        
     // If no subscribers are registered, return null
     if (subscribers == null || subscribers.isEmpty()) {
         return null;
     }
 
-    // Get the next microservice in the round-robin queue
-    synchronized (subscribers) { // Synchronize access to the queue to ensure thread safety
+    // Get the next microservice in the round-robin queue // Synchronize access to the queue to ensure thread safety
         MicroService targetMicroservice = subscribers.poll(); // Remove from the head
         subscribers.add(targetMicroservice); // Add back to the tail for round-robin logic
 
@@ -100,7 +101,6 @@ public  <T> Future<T> sendEvent(Event<T> event) {
 
             return future; // Return the Future to the sender
         }
-    }
 
     return null; // Return null if something went wrong
 }
@@ -108,7 +108,6 @@ public  <T> Future<T> sendEvent(Event<T> event) {
 
     @Override
     public void register(MicroService m) {
-        // TODO Auto-generated method stub
         LinkedBlockingQueue<Message> queue_to_add = new LinkedBlockingQueue<Message>();
         //if this name doesnt exist as a key in the HashMap, add it to the map with a value of an empty queue
         MicroServices_Queues.putIfAbsent(m, queue_to_add);
