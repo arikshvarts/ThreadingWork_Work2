@@ -179,7 +179,8 @@ public abstract class MicroService implements Runnable {
             try {
                 Message msg = msg_bus.awaitMessage(this);
                 if (msg != null) {
-                this.handleMessage(msg);     
+                    System.out.println(getName() + " processing message: " + msg.getClass().getSimpleName());
+                    this.handleMessage(msg);     
              }
         
     }
@@ -187,6 +188,7 @@ public abstract class MicroService implements Runnable {
             Thread.currentThread().interrupt();
             terminate();
         }
+        
     }
     msg_bus.unregister(this);
 
