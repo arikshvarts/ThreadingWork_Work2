@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.services;
-
+import bgu.spl.mics.application.messages.TickBroadcast;
+import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.MicroService;
 
 /**
@@ -7,6 +8,9 @@ import bgu.spl.mics.MicroService;
  * at regular intervals and controlling the simulation's duration.
  */
 public class TimeService extends MicroService {
+    private final int tickDuration;  // Duration of each tick in milliseconds
+    private final int totalTicks;   // Total number of ticks before termination
+    private int currentTick;        // Tracks the current tick number
 
     /**
      * Constructor for TimeService.
@@ -15,8 +19,11 @@ public class TimeService extends MicroService {
      * @param Duration  The total number of ticks before the service terminates.
      */
     public TimeService(int TickTime, int Duration) {
-        super("Change_This_Name");
-        // TODO Implement this
+        super("TimeService");
+        this.tickDuration = TickTime;
+        this.totalTicks = Duration;
+        this.currentTick = 0;
+
     }
 
     /**
@@ -25,6 +32,22 @@ public class TimeService extends MicroService {
      */
     @Override
     protected void initialize() {
-        // TODO Implement this
+        while (currentTick < totalTicks) {
+            currentTick++;
+            // Broadcast the current tick to all subscribed microservices
+            sendBroadcast(new TickBroadcast(currentTick));
+            try {
+                // Simulate the passage of time for this tick
+                Thread.sleep(tickDuration);
+            } catch (InterruptedException e) {
+                // Handle interruption and terminate the service
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+        // Signal termination after all ticks are completed
+        sendBroadcast(new TerminatedBroadcast());
+        terminate();
+
     }
 }

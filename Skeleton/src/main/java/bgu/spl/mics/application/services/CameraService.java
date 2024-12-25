@@ -24,6 +24,7 @@ public class CameraService extends MicroService {
     public CameraService(Camera camera) {
         super("Camera");
         this.camera = camera;
+        msgBus =MessageBusImpl.getInstance()
     }
 
     /**
@@ -33,7 +34,7 @@ public class CameraService extends MicroService {
      */
     @Override
     protected void initialize() {
-        MessageBusImpl.getInstance().subscribeBroadcast(TickBroadcast.class,(TickBroadcast c)->{
+        (TickBroadcast.class,(TickBroadcast c)->{
             detectedObjectsEvent eve = camera.handleTick(c.getCurrentTime());
             if (eve!=null){
                 Future<boolean> fut= MessageBusImpl.getInstance().sendEvent(eve);
@@ -45,9 +46,8 @@ public class CameraService extends MicroService {
         subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast terminateBroadcast) -> {
             terminate();
         }); 
-
-
-
-
-
+        CrashedBroadcast(CrashedBroadcast.class, (CrashedBroadcast terminateBroadcast) -> {
+            terminate();
+        }); 
+    }
 }
