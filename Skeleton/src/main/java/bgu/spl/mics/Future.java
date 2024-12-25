@@ -13,10 +13,12 @@ import java.util.concurrent.TimeUnit;
 public class Future<T> {
     private T result;
     private volatile boolean isDone;
+    private Object lock;
     
     public Future() {
         this.result = null;
         this.isDone = false;
+        this.lock = new Object();
     }
     
     /**
@@ -27,26 +29,31 @@ public class Future<T> {
      * @return return the result of type T if it is available, if not wait until it is available.
      *         
      */
-    public synchronized T get() {
+    public T get() {
         while(!isDone) {
+            synchronized (lock) {
             try {
-                wait();
+                lock.wait();
             } catch (InterruptedException e) {                
                 Thread.currentThread().interrupt();
-                System.out.println("Error: Future.get() was interrupted."); 
             }
         }
+    }
         return result;
     }
     
     /**
      * Resolves the result of this Future object.
      */
-    public synchronized void resolve (T result) {
+    public void resolve (T result) {
+        if(!isDone) {
         this.result = result;
         this.isDone=true;
+        synchronized(lock) {
         notifyAll();
+        }
     }
+}
     
     /**
      * @return true if this object has been resolved, false otherwise
@@ -66,22 +73,24 @@ public class Future<T> {
      *         wait for {@code timeout} TimeUnits {@code unit}. If time has
      *         elapsed, return null.
      */
-    public synchronized T get(long timeout, TimeUnit unit) {
+    public  T get(long timeout, TimeUnit unit) {
         long millisTimeout = unit.toMillis(timeout); // Convert timeout to milliseconds
         long endTime = System.currentTimeMillis() + millisTimeout; // Calculate end time
         while (!isDone) {
+            synchronized (lock) {
             long remainingTime = endTime - System.currentTimeMillis();
             if (remainingTime <= 0) {
                 return null; // Timeout has elapsed
             }
             try{
-            wait(remainingTime); // Wait for the remaining time or until notified
+            lock.wait(remainingTime); // Wait for the remaining time or until notified
         }
     catch (InterruptedException e) {
         Thread.currentThread().interrupt();
         System.out.println("Error: Future.get() was interrupted."); 
         }
         }
+    }
         return result;
 }
 
