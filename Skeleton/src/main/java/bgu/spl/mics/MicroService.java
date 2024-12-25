@@ -144,6 +144,7 @@ public abstract class MicroService implements Runnable {
      */
     protected final void terminate() {
         this.terminated = true;
+        MessageBusImpl.getInstance().unregister(this);
     }
 
     /**
@@ -153,6 +154,8 @@ public abstract class MicroService implements Runnable {
     public final String getName() {
         return name;
     }
+
+
     @SuppressWarnings("unchecked")
     private <T> void handleMessage(Message message) {
         Callback<T> callback = (Callback<T>) messageCallBack.get(message.getClass());
@@ -169,15 +172,19 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
-        initialize();
         MessageBusImpl.getInstance().register(this);
-        try {
-            while (!terminated) {
+        initialize();
+        while (!terminated) {
+            try {
                 Message msg = MessageBusImpl.getInstance().awaitMessage(this);
+                if (msg != null) {
                 this.handleMessage(msg);     
              }
-        } catch (InterruptedException e) {
+        
+    }
+         catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
+}
 }

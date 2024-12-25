@@ -1,6 +1,10 @@
 package bgu.spl.mics.application.services;
 
+import java.util.List;
+
+import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.objects.*;
 
 /**
  * CameraService is responsible for processing data from the camera and
@@ -10,6 +14,7 @@ import bgu.spl.mics.MicroService;
  * the system's StatisticalFolder upon sending its observations.
  */
 public class CameraService extends MicroService {
+    private final Camera camera;
 
     /**
      * Constructor for CameraService.
@@ -17,8 +22,8 @@ public class CameraService extends MicroService {
      * @param camera The Camera object that this service will use to detect objects.
      */
     public CameraService(Camera camera) {
-        super("Change_This_Name");
-        // TODO Implement this
+        super("Camera");
+        this.camera = camera;
     }
 
     /**
@@ -28,6 +33,21 @@ public class CameraService extends MicroService {
      */
     @Override
     protected void initialize() {
-        // TODO Implement this
-    }
+        MessageBusImpl.getInstance().subscribeBroadcast(TickBroadcast.class,(TickBroadcast c)->{
+            detectedObjectsEvent eve = camera.handleTick(c.getCurrentTime());
+            if (eve!=null){
+                Future<boolean> fut= MessageBusImpl.getInstance().sendEvent(eve);
+                if (fut.get()==false){
+                    //crash
+                }
+            }
+        });
+        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast terminateBroadcast) -> {
+            terminate();
+        }); 
+
+
+
+
+
 }
