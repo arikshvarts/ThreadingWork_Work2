@@ -1,46 +1,49 @@
     package bgu.spl.mics.application.objects;
 
-    /**
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
      * Holds statistical information about the system's operation.
      * This class aggregates metrics such as the runtime of the system,
      * the number of objects detected and tracked, and the number of landmarks identified.
      */
     public class StatisticalFolder {
         private int systemRuntime;
-        private int numDetectedObjects;
-        private int numTrackedObjects;
-        private int numLandmarks;
+        private AtomicInteger numDetectedObjects;
+        private AtomicInteger numTrackedObjects;
+        private AtomicInteger numLandmarks;
+        
     
         public synchronized void updateRuntime(int ticks) {
             this.systemRuntime = ticks;
         }
     
         public synchronized void incrementDetectedObjects() {
-            this.numDetectedObjects++;
+            this.numDetectedObjects.incrementAndGet();
         }
     
         public synchronized void incrementTrackedObjects() {
-            this.numTrackedObjects++;
+            this.numTrackedObjects.incrementAndGet();
         }
     
         public synchronized void incrementLandmarks() {
-            this.numLandmarks++;
+            this.numLandmarks.incrementAndGet();
         }
     
         // Getters
         public int getSystemRuntime() {
-            return systemRuntime;
+            return systemRuntime++;
         }
     
-        public int getNumDetectedObjects() {
+        public AtomicInteger getNumDetectedObjects() {
             return numDetectedObjects;
         }
     
-        public int getNumTrackedObjects() {
+        public AtomicInteger getNumTrackedObjects() {
             return numTrackedObjects;
         }
     
-        public int getNumLandmarks() {
+        public AtomicInteger getNumLandmarks() {
             return numLandmarks;
         }
     }

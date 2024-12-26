@@ -73,25 +73,28 @@ public class Future<T> {
      *         wait for {@code timeout} TimeUnits {@code unit}. If time has
      *         elapsed, return null.
      */
-    public  T get(long timeout, TimeUnit unit) {
+    public T get(long timeout, TimeUnit unit) {
         long millisTimeout = unit.toMillis(timeout); // Convert timeout to milliseconds
-        long endTime = System.currentTimeMillis() + millisTimeout; // Calculate end time
-        while (!isDone) {
-            synchronized (lock) {
-            long remainingTime = endTime - System.currentTimeMillis();
-            if (remainingTime <= 0) {
-                return null; // Timeout has elapsed
+        long endTime = System.currentTimeMillis() + millisTimeout; // Calculate the absolute end time
+    
+        synchronized (lock) {
+            while (!isDone) {
+                long remainingTime = endTime - System.currentTimeMillis();
+                if (remainingTime <= 0) {
+                    return null; // Timeout has elapsed
+                }
+                try {
+                    lock.wait(remainingTime); // Wait for the remaining time or until notified
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt(); // Restore the interrupt status
+                    return null; // Return null on interruption
+                }
             }
-            try{
-            lock.wait(remainingTime); // Wait for the remaining time or until notified
-        }
-    catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        System.out.println("Error: Future.get() was interrupted."); 
-        }
+            return result; // Return the resolved result
         }
     }
-        return result;
+        
+}
 }
 
 }

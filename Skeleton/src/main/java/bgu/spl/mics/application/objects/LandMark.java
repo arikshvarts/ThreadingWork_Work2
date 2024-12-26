@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.objects;
 import java.util.ArrayList;
+import java.util.List;
 /**
  * Represents a landmark in the environment map.
  * Landmarks are identified and updated by the FusionSlam service.
@@ -25,5 +26,9 @@ public class LandMark {
 
     public ArrayList<CloudPoint> getCoordinates() {
         return coordinates;
+    }
+
+    public void setCoordinates(ArrayList<CloudPoint> coordinates) {
+        this.coordinates = coordinates;
     }
 }
