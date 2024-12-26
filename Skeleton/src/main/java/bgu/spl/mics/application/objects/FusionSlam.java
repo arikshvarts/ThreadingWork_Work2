@@ -22,18 +22,9 @@ public class FusionSlam {
     private static class FusionSlamHolder {
         private static final FusionSlam instance = new FusionSlam();
     }
-    public FusionSlam() {
+    private FusionSlam(ArrayList<Pose> poses) {
         this.landmarks=new ConcurrentHashMap<>();
-        this.currentPose = null; // Initialize without a pose
-
-        // this.y=y;
-        // this.yaw=yaw;
-        // robot_coord_x=pose.getX();
-        // robot_coord_y=pose.getY();
-        // robot_coord_yaw=pose.getYaw();
-        // trackedObjectsEvent= new TrackedObjectsEvent();
-
-
+        this.poses=poses;
     }
     public static FusionSlam getInstance() {
         return FusionSlamHolder.instance;
@@ -49,9 +40,9 @@ public class FusionSlam {
     }   
 
 
-    public synchronized void updatePose(Pose pose) {
-        this.currentPose = pose;
-    }
+    // public synchronized void updatePose(Pose pose) {
+    //     this.poses[-1] = pose;
+    // }
 
 
 
@@ -80,7 +71,8 @@ public class FusionSlam {
 
         return result;
     }
-    private void updateLandmarks(LandMark newLandmark) {
+    private synchronized void updateLandmarks(LandMark newLandmark) {//check if this realy needs to be synchronized or there is better solution!!!!
+
         LandMark oldMark = landmarks.get(newLandmark.getId());
         if (oldMark == null) {
             // Add the new landmark to the map
