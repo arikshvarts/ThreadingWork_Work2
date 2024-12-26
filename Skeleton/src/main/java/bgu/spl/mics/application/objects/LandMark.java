@@ -4,12 +4,12 @@ import java.util.ArrayList;
  * Represents a landmark in the environment map.
  * Landmarks are identified and updated by the FusionSlam service.
  */
-class Landmark {
+public class LandMark {
     private  String id;
     private  String description;
     private  ArrayList<CloudPoint> coordinates;
 
-    public Landmark(String id, String description, ArrayList<CloudPoint> coordinates) {
+    public LandMark(String id, String description, ArrayList<CloudPoint> coordinates) {
         this.id = id;
         this.description = description;
         this.coordinates = coordinates;
