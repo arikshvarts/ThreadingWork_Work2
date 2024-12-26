@@ -1,0 +1,12 @@
+
+Skeleton/target/classes/bgu/spl/mics/application/messages/TerminatedBroadcast.class
+Skeleton/target/classes/bgu/spl/mics/application/objects/FusionSlam$FusionSlamHolder.class
+Skeleton/target/classes/bgu/spl/mics/application/objects/FusionSlam.class
+Skeleton/target/classes/bgu/spl/mics/application/objects/LandMark.class
+Skeleton/target/classes/bgu/spl/mics/application/objects/LiDarDataBase.class
+Skeleton/target/classes/bgu/spl/mics/application/objects/Pose.class
+Skeleton/target/classes/bgu/spl/mics/application/objects/StatisticalFolder.class
+Skeleton/target/classes/bgu/spl/mics/application/services/CameraService.class
+Skeleton/target/classes/bgu/spl/mics/application/services/TimeService.class
+Skeleton/target/classes/bgu/spl/mics/MessageBusImpl.class
+*.class
