@@ -14,7 +14,7 @@ public class Camera {
     private ArrayList<StampedDetectedObjects> detectedObjectsList;
     private final String dataFilePath; //the path to this camera data we have as a string in the Configuration JSON File
 
-    public Camera(int id, int frequency, STATUS status, string dataFilePath) {
+    public Camera(int id, int frequency, STATUS status, String dataFilePath) {
         this.id = id;
         this.frequency = frequency;
         this.status = status;
