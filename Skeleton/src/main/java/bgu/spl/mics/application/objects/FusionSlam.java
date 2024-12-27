@@ -4,34 +4,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import bgu.spl.mics.application.objects.LandMark; // Update with the correct package path
-
-import bgu.spl.mics.application.messages.TrackedObjectsEvent;
-
 /**
  * Manages the fusion of sensor data for simultaneous localization and mapping (SLAM).
  * Combines data from multiple sensors (e.g., LiDAR, camera) to build and update a global map.
  * Implements the Singleton pattern to ensure a single instance of FusionSlam exists.
  */
 public class FusionSlam {
-    private final Map<String, LandMark> landmarks; // Global map of landmarks
-    private final ArrayList<Pose> poses; // list of Poses of the robot
+    private final ConcurrentHashMap<String, LandMark> landmarks; // Global map of landmarks
+    private  ArrayList<Pose> poses; // list of Poses of the robot
 
 
     // Singleton instance holder
     private static class FusionSlamHolder {
         private static final FusionSlam instance = new FusionSlam();
     }
-    private FusionSlam(ArrayList<Pose> poses) {
+    private FusionSlam() {
         this.landmarks=new ConcurrentHashMap<>();
-        this.poses=poses;
+        this.poses=new ArrayList<>();
     }
     public static FusionSlam getInstance() {
         return FusionSlamHolder.instance;
     }
 
     public void processObjects(ArrayList<TrackedObject> trackedObjects) {
-        ArrayList<LandMark> landmarksLst = new ArrayList<>();
 
         for (TrackedObject trackedObject : trackedObjects) {
             LandMark lndMark = translateCoordinateSys(trackedObject);
@@ -40,18 +35,19 @@ public class FusionSlam {
     }   
 
 
-    // public synchronized void updatePose(Pose pose) {
-    //     this.poses[-1] = pose;
-    // }
+    public synchronized void updatePose(ArrayList<Pose> recPoses) {
+        this.poses=recPoses;
+
+    }
 
 
 
     public LandMark translateCoordinateSys(TrackedObject trackedObject) {
         ArrayList<CloudPoint> globalCoordinates = new ArrayList<>();
-        double yaw_rad=currentPose.getYaw()*Math.PI/180;
+        double yaw_rad=poses.getLast().getYaw()*Math.PI/180;
         for (CloudPoint localPoint : trackedObject.getCoordinates()) {
-            double x_global=localPoint.getX()*Math.cos(yaw_rad)-localPoint.getY()*Math.sin(yaw_rad)+currentPose.getX();
-            double y_global=localPoint.getX()*Math.sin(yaw_rad)+localPoint.getY()*Math.cos(yaw_rad)+currentPose.getY();
+            double x_global=localPoint.getX()*Math.cos(yaw_rad)-localPoint.getY()*Math.sin(yaw_rad)+poses.getLast().getX();
+            double y_global=localPoint.getX()*Math.sin(yaw_rad)+localPoint.getY()*Math.cos(yaw_rad)+poses.getLast().getY();
             globalCoordinates.add(new CloudPoint(x_global, y_global));
         }
         return new LandMark(trackedObject.getId(),trackedObject.getDescription(),globalCoordinates);
@@ -71,7 +67,7 @@ public class FusionSlam {
 
         return result;
     }
-    private synchronized void updateLandmarks(LandMark newLandmark) {//check if this realy needs to be synchronized or there is better solution!!!!
+    private  void updateLandmarks(LandMark newLandmark) {//check if this realy needs to be synchronized or there is better solution!!!!
 
         LandMark oldMark = landmarks.get(newLandmark.getId());
         if (oldMark == null) {
