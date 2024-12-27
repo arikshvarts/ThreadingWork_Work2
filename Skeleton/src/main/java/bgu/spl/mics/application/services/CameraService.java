@@ -1,4 +1,3 @@
-package bgu.spl.mics.application.services;
 
 import java.util.List;
 
@@ -15,7 +14,8 @@ import bgu.spl.mics.application.objects.*;
  */
 public class CameraService extends MicroService {
     private final Camera camera;
-
+    MessageBusImpl msgBus;
+    private int last_tick_detected:
     /**
      * Constructor for CameraService.
      *
@@ -33,21 +33,45 @@ public class CameraService extends MicroService {
      * DetectObjectsEvents.
      */
     @Override
+    // protected void initialize() {
+    //      msgBus.subscribeBroadcast(TickBroadcast.class,(TickBroadcast c)->{
+    //         detectedObjectsEvent eve = camera.handleTick(c.getCurrentTime());
+    //         if (eve!=null){
+    //             Future<boolean> fut= MessageBusImpl.getInstance().sendEvent(eve);
+    //             if (fut.get()==false){
+    //                 //crash
+    //             }
+    //         }
+    //     });
+    //     subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast terminateBroadcast) -> {
+    //         terminate();
+    //     }); 
+    //     CrashedBroadcast(CrashedBroadcast.class, (CrashedBroadcast terminateBroadcast) -> {
+    //         terminate();
+    //     }); 
+    // }
     protected void initialize() {
-        (TickBroadcast.class,(TickBroadcast c)->{
-            detectedObjectsEvent eve = camera.handleTick(c.getCurrentTime());
+        //update relevant callbacks into the messageCallBack hashmap
+        messageCallBack.putIfAbsent(TickBroadcast.class, (TickBroadcast c)->{
+            detectedObjectsEvent eve = camera.handleTick(c.getCurrentTick());
             if (eve!=null){
+                if()
                 Future<boolean> fut= MessageBusImpl.getInstance().sendEvent(eve);
                 if (fut.get()==false){
-                    //crash
+                    //crash //livdok ma laasot cshfuture ho false
                 }
             }
         });
-        subscribeBroadcast(TerminateBroadcast.class, (TerminateBroadcast terminateBroadcast) -> {
+        msgBus.subscribeBroadcast(TickBroadcast.class, messageCallBack(TickBroadcast.class));
+
+        messageCallBack.putIfAbsent(TerminateBroadcast.class, (TerminateBroadcast c)->{
             terminate();
-        }); 
-        CrashedBroadcast(CrashedBroadcast.class, (CrashedBroadcast terminateBroadcast) -> {
-            terminate();
-        }); 
-    }
+        });
+
+       subscribeBroadcast(TerminateBroadcast.class, TerminateBroadcast.class); 
+
+       messageCallBack.putIfAbsent(CrashedBroadcast.class, (CrashedBroadcast c)->{
+        terminate();
+    });
+
 }
