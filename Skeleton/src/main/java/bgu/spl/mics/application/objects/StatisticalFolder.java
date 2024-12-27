@@ -14,20 +14,20 @@ import java.util.concurrent.atomic.AtomicInteger;
         private AtomicInteger numLandmarks;
         
     
-        public  void updateRuntime(int ticks) {
+        public  void updateRuntime(int ticks) {//synchronized maybe?
             this.systemRuntime = ticks;
         }
     
-        public  void incrementDetectedObjects() {
-            this.numDetectedObjects.incrementAndGet();
+        public  void incrementDetectedObjects(int add) {
+            this.numDetectedObjects.addAndGet(add);
         }
     
-        public  void incrementTrackedObjects() {
-            this.numTrackedObjects.incrementAndGet();
+        public  void incrementTrackedObjects(int add) {
+            this.numTrackedObjects.addAndGet(add);
         }
     
-        public  void incrementLandmarks() {
-            this.numLandmarks.incrementAndGet();
+        public  void incrementLandmarks(int add) {
+            this.numLandmarks.addAndGet(add);
         }
     
         // Getters

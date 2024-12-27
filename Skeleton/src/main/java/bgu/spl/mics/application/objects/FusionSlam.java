@@ -67,7 +67,7 @@ public class FusionSlam {
 
         return result;
     }
-    private synchronized void updateLandmarks(LandMark newLandmark) {//check if this realy needs to be synchronized or there is better solution!!!!
+    private  void updateLandmarks(LandMark newLandmark) {//check if this realy needs to be synchronized or there is better solution!!!!
 
         LandMark oldMark = landmarks.get(newLandmark.getId());
         if (oldMark == null) {
