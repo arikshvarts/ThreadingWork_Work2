@@ -1,6 +1,15 @@
 package bgu.spl.mics.application.services;
 
+import javax.sound.midi.Track;
+
+import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.messages.CrashedBroadcast;
+import bgu.spl.mics.application.messages.PoseEvent;
+import bgu.spl.mics.application.messages.TerminatedBroadcast;
+import bgu.spl.mics.application.messages.TickBroadcast;
+import bgu.spl.mics.application.messages.TrackedObjectsEvent;
+import bgu.spl.mics.application.objects.FusionSlam;
 
 /**
  * FusionSlamService integrates data from multiple sensors to build and update
@@ -10,6 +19,8 @@ import bgu.spl.mics.MicroService;
  * transforming and updating the map with new landmarks.
  */
 public class FusionSlamService extends MicroService {
+    FusionSlam fusionSlam;
+
     /**
      * Constructor for FusionSlamService.
      *
@@ -17,7 +28,7 @@ public class FusionSlamService extends MicroService {
      */
     public FusionSlamService(FusionSlam fusionSlam) {
         super("Change_This_Name");
-        // TODO Implement this
+        FusionSlam fusionSlam = new FusionSlam();
     }
 
     /**
@@ -27,6 +38,35 @@ public class FusionSlamService extends MicroService {
      */
     @Override
     protected void initialize() {
-        // TODO Implement this
-    }
+
+
+//         to TickBroadcast, TrackedObjectsEvent, PoseEvent, ,
+// CrashedBroadcast.
+
+
+
+        subscribeEvent(TrackedObjectsEvent.class,(TrackedObjectsEvent)->{
+
+        });
+
+
+        subscribeEvent(PoseEvent.class,(PoseEvent)->{
+            PoseEvent.getPose
+        });
+
+        subscribeBroadcast(TickBroadcast.class,(TickBroadcast)->{
+
+         });
+
+       subscribeBroadcast(TerminatedBroadcast.class,(TerminatedBroadcast)->
+       {
+              terminate(); 
+       });
+
+
+       subscribeBroadcast(CrashedBroadcast.class,(subscribeBroadcast)->
+       {
+              terminate(); 
+       });
+        }
 }

@@ -62,7 +62,9 @@ public class CameraService extends MicroService {
                 }
             }
         });
-        msgBus.subscribeBroadcast(TickBroadcast.class, messageCallBack(TickBroadcast.class));
+        msgBus.subscribeBroadcast(TickBroadcast.class, messageCallBack->
+    }
+    
 
         messageCallBack.putIfAbsent(TerminateBroadcast.class, (TerminateBroadcast c)->{
             terminate();
