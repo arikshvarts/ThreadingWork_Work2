@@ -1,18 +1,26 @@
 package bgu.spl.mics.application.objects;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import bgu.spl.mics.StatsManager;
+import bgu.spl.mics.application.messages.DetectObjectsEvent;
+
 public class Camera {
+
     private int id;
     private int frequency;
     private STATUS status;
-    private ArrayList<StampedDetectedObjects> detectedObjectsList;
+    private final ArrayList<StampedDetectedObjects> detectedObjectsList;
     private final String dataFilePath; //the path to this camera data we have as a string in the Configuration JSON File
+    private final ArrayList<StampedDetectedObjects> CameraData;
+    StatisticalFolder statsFolder = StatsManager.getStatsFolder();
 
     public Camera(int id, int frequency, STATUS status, String dataFilePath) {
         this.id = id;
@@ -20,6 +28,8 @@ public class Camera {
         this.status = status;
         this.detectedObjectsList = new ArrayList<>();
         this.dataFilePath = dataFilePath;
+        this.CameraData = parseCameraData();
+
     }
 
     public int getId() {
@@ -54,41 +64,38 @@ public class Camera {
         detectedObjectsList.add(new StampedDetectedObjects(time, detectedObjects));
     }
 
-
-// Inner classes to model JSON structure
-static class CameraData {
-    private int time;
-    private List<DetectedObject> detectedObjects;
-
-    public int getTime() {
-        return time;
-    }
-
     //parsing from camera_data.json
-    public DetectObjectsEvent handleTick(int currTime) {
-        List<CameraData> cameraDataList = parseCameraData();
-        for (CameraData data : cameraDataList) {
-            if (data.getTime() == currTime) {
-                return new DetectObjectsEvent(data.getDetectedObjects());
-            }
-        }
-        // Return an empty List if there are no objects that detected at this time
-        return new DetectObjectsEvent(new ArrayList<>());
-    }
-        //need to check how to relate to the frequency
-
-    private List<CameraData> parseCameraData() {
+    private ArrayList<StampedDetectedObjects> parseCameraData() {
         try (FileReader reader = new FileReader(dataFilePath)) {
             Gson gson = new Gson();
-            Type listType = new TypeToken<List<CameraData>>() {}.getType();
+            Type listType = new TypeToken<List<StampedDetectedObjects>>() {
+            }.getType();
             return gson.fromJson(reader, listType);
         } catch (IOException e) {
-            System.err.println("Error reading camera data file: " + e.getMessage());
-            return new ArrayList<>();
+            System.err.println("Error reading camera data file for Camera " + id + ": " + e.getMessage());
+            return new ArrayList<>(); // Return an empty list if an error occurs
         }
     }
 
+    public DetectObjectsEvent handleTick(int currTime) {
+        for (StampedDetectedObjects data : CameraData) {
+            if (data.getTime() == currTime - frequency) {
+                //we detected objects at tick-frequency
+                for (DetectedObject obj : data.getDetectedObjects()) {
+                    //the logic is to check for each object the camera detected now if it didn't detect untill now
+                    //add it to allOjects in the Statsanager and increment num of detected objects
+                    if (StatsManager.getAllObjects().contains(obj) == false) {
+                        StatsManager.getAllObjects().add(obj);
+                        statsFolder.incrementDetectedObjects();
+                    }
 
+                }
+                return new DetectObjectsEvent(currTime, data.getDetectedObjects());
+            }
+            // Return an empty List if there are no objects that detected at this time
+        }
+        return new DetectObjectsEvent(currTime, new ArrayList<>());
+    }
 
     @Override
     public String toString() {
