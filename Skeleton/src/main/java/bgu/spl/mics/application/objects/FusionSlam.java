@@ -10,7 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * Implements the Singleton pattern to ensure a single instance of FusionSlam exists.
  */
 public class FusionSlam {
-    private final ConcurrentHashMap<String, LandMark> landmarks; // Global map of landmarks
+    // private final ConcurrentHashMap<String, LandMark>
+    private ArrayList<LandMark> landmarks; // Global map of landmarks
     private  ArrayList<Pose> poses; // list of Poses of the robot
 
 
@@ -19,8 +20,8 @@ public class FusionSlam {
         private static final FusionSlam instance = new FusionSlam();
     }
     private FusionSlam() {
-        this.landmarks=new ConcurrentHashMap<>();
-        this.poses=new ArrayList<>();
+        this.landmarks=new ArrayList<LandMark>();
+        this.poses=new ArrayList<Pose>();
     }
     public static FusionSlam getInstance() {
         return FusionSlamHolder.instance;
@@ -68,19 +69,21 @@ public class FusionSlam {
         return result;
     }
     private  void updateLandmarks(LandMark newLandmark) {//check if this realy needs to be synchronized or there is better solution!!!!
-
-        LandMark oldMark = landmarks.get(newLandmark.getId());
-        if (oldMark == null) {
-            // Add the new landmark to the map
-            landmarks.put(newLandmark.getId(), newLandmark);
+        boolean flag =true;
+        for (LandMark landM : landmarks){
+            if (landM.getId().equals(newLandmark.getId())){
+                flag=false;
+                ArrayList<CloudPoint> averagedCoordinates = averageCoordinates(landM.getCoordinates(), newLandmark.getCoordinates());
+                landM.setCoordinates(averagedCoordinates);
+            }
         }
         // Refine the existing landmark by averaging coordinates
-        else{
-        ArrayList<CloudPoint> averagedCoordinates = averageCoordinates(oldMark.getCoordinates(), newLandmark.getCoordinates());
-        oldMark.setCoordinates(averagedCoordinates);
+        if (!flag) {
+            landmarks.add(newLandmark);
         }
-    }
-    public Map<String, LandMark> getLandmarks() {
+        }
+    
+    public List<LandMark> getLandmarks() {
         return landmarks;
     }
 }

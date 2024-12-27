@@ -33,9 +33,9 @@ public class TimeService extends MicroService {
     @Override
     protected void initialize() {
         while (currentTick < totalTicks) {
-            currentTick++;
             // Broadcast the current tick to all subscribed microservices
             sendBroadcast(new TickBroadcast(currentTick));
+            currentTick++;
             try {
                 // Simulate the passage of time for this tick
                 Thread.sleep(tickDuration);
@@ -46,7 +46,7 @@ public class TimeService extends MicroService {
             }
         }
         // Signal termination after all ticks are completed
-        sendBroadcast(new TerminatedBroadcast());
+        sendBroadcast(new TerminatedBroadcast("TimeService"));
         terminate();
 
     }

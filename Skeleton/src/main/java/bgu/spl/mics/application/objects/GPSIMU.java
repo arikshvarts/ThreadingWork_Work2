@@ -41,4 +41,8 @@ public class GPSIMU {
     public void setPoseList(ArrayList<Pose> poseList) {
         this.PoseList = poseList;
     }
+
+    public Pose getTickAtTime(ArrayList<Pose> poseList) {
+        return this.PoseList.get(this.currentTick);
+    }
 }
