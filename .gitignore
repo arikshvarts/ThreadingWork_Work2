@@ -10,3 +10,5 @@ Skeleton/target/classes/bgu/spl/mics/application/services/CameraService.class
 Skeleton/target/classes/bgu/spl/mics/application/services/TimeService.class
 Skeleton/target/classes/bgu/spl/mics/MessageBusImpl.class
 *.class
+*.class
+*.class
