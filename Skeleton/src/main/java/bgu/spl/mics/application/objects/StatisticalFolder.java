@@ -14,19 +14,19 @@ import java.util.concurrent.atomic.AtomicInteger;
         private AtomicInteger numLandmarks;
         
     
-        public synchronized void updateRuntime(int ticks) {
+        public  void updateRuntime(int ticks) {
             this.systemRuntime = ticks;
         }
     
-        public synchronized void incrementDetectedObjects() {
+        public  void incrementDetectedObjects() {
             this.numDetectedObjects.incrementAndGet();
         }
     
-        public synchronized void incrementTrackedObjects() {
+        public  void incrementTrackedObjects() {
             this.numTrackedObjects.incrementAndGet();
         }
     
-        public synchronized void incrementLandmarks() {
+        public  void incrementLandmarks() {
             this.numLandmarks.incrementAndGet();
         }
     
