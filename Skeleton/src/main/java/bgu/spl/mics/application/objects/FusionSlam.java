@@ -14,17 +14,17 @@ import bgu.spl.mics.application.messages.TrackedObjectsEvent;
  * Implements the Singleton pattern to ensure a single instance of FusionSlam exists.
  */
 public class FusionSlam {
-    private final Map<String, LandMark> landmarks; // Global map of landmarks
-    private final ArrayList<Pose> poses; // list of Poses of the robot
+    private final ConcurrentHashMap<String, LandMark> landmarks; // Global map of landmarks
+    private  ArrayList<Pose> poses; // list of Poses of the robot
 
 
     // Singleton instance holder
     private static class FusionSlamHolder {
         private static final FusionSlam instance = new FusionSlam();
     }
-    private FusionSlam(ArrayList<Pose> poses) {
+    private FusionSlam() {
         this.landmarks=new ConcurrentHashMap<>();
-        this.poses=poses;
+        this.poses=new ArrayList<>();
     }
     public static FusionSlam getInstance() {
         return FusionSlamHolder.instance;
@@ -40,9 +40,10 @@ public class FusionSlam {
     }   
 
 
-    // public synchronized void updatePose(Pose pose) {
-    //     this.poses[-1] = pose;
-    // }
+    public synchronized void updatePose(ArrayList<Pose> recPoses) {
+        this.poses=recPoses;
+
+    }
 
 
 
