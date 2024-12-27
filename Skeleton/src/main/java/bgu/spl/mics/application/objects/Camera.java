@@ -54,6 +54,16 @@ public class Camera {
         detectedObjectsList.add(new StampedDetectedObjects(time, detectedObjects));
     }
 
+
+// Inner classes to model JSON structure
+static class CameraData {
+    private int time;
+    private List<DetectedObject> detectedObjects;
+
+    public int getTime() {
+        return time;
+    }
+
     //parsing from camera_data.json
     public DetectObjectsEvent handleTick(int currTime) {
         List<CameraData> cameraDataList = parseCameraData();
@@ -65,8 +75,20 @@ public class Camera {
         // Return an empty List if there are no objects that detected at this time
         return new DetectObjectsEvent(new ArrayList<>());
     }
-        //check how to relate to the frequency
+        //need to check how to relate to the frequency
+
+    private List<CameraData> parseCameraData() {
+        try (FileReader reader = new FileReader(dataFilePath)) {
+            Gson gson = new Gson();
+            Type listType = new TypeToken<List<CameraData>>() {}.getType();
+            return gson.fromJson(reader, listType);
+        } catch (IOException e) {
+            System.err.println("Error reading camera data file: " + e.getMessage());
+            return new ArrayList<>();
+        }
     }
+
+
 
     @Override
     public String toString() {
