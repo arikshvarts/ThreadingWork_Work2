@@ -77,20 +77,21 @@ public class MessageBusImpl implements MessageBus {
     
         @Override
         public <T> Future<T> sendEvent(Event<T> event) {
-            rwLock.readLock().lock();
             try {
+                rwLock.readLock().lock();
                 BlockingQueue<MicroService> subscribers = event_Subscribers.get(event.getClass());
                 if (subscribers == null || subscribers.isEmpty()) {
                     return null;
                 }
-                // Upgrade to write lock for round-robin modification
-                rwLock.readLock().unlock();
-                rwLock.readLock().lock();
                 try {
+                    rwLock.readLock().unlock();
+                    rwLock.writeLock().lock();
                     MicroService targetMicroservice = subscribers.poll();
                     subscribers.add(targetMicroservice);
-    
                     BlockingQueue<Message> targetQueue = MicroServices_Queues.get(targetMicroservice);
+                    rwLock.writeLock().unlock();
+                    rwLock.readLock().lock();
+
                     if (targetQueue != null) {
                         Future<T> future = new Future<>();
                         FutureToEvent.put(event, future);
@@ -99,14 +100,13 @@ public class MessageBusImpl implements MessageBus {
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                } finally {
-                    rwLock.readLock().unlock();
                 }
             } finally {
                 if (rwLock.getReadHoldCount() > 0) {
                     rwLock.readLock().unlock();
                 }
             }
+            
             return null;
         }
     
