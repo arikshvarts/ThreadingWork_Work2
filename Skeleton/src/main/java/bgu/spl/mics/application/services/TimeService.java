@@ -1,6 +1,8 @@
 package bgu.spl.mics.application.services;
 import bgu.spl.mics.application.messages.TickBroadcast;
+import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
+import bgu.spl.mics.Callback;
 import bgu.spl.mics.MicroService;
 
 /**
@@ -32,6 +34,19 @@ public class TimeService extends MicroService {
      */
     @Override
     protected void initialize() {
+
+        messageCallBack.putIfAbsent(TerminatedBroadcast.class, (TerminatedBroadcast c) -> {
+            terminate();
+        });
+
+        subscribeBroadcast(TerminatedBroadcast.class, (Callback<TerminatedBroadcast>) messageCallBack.get(TerminatedBroadcast.class));
+
+        messageCallBack.putIfAbsent(CrashedBroadcast.class, (CrashedBroadcast c) -> {
+            terminate(); //both of TerminatedBroadcast and CrashedBroadcast are leading to termination?
+        });
+
+        subscribeBroadcast(CrashedBroadcast.class, (Callback<CrashedBroadcast>) messageCallBack.get(CrashedBroadcast.class));
+
         while (currentTick < totalTicks) {
             // Broadcast the current tick to all subscribed microservices
             sendBroadcast(new TickBroadcast(currentTick));
