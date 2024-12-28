@@ -1,26 +1,24 @@
 package bgu.spl.mics.application.messages;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import bgu.spl.mics.Event;
-import bgu.spl.mics.application.objects.DetectedObject;
+import bgu.spl.mics.application.objects.StampedDetectedObjects;
 
 public class DetectObjectsEvent implements Event<Boolean> {
 
     private final int time;                       // Time the objects were detected
-    private final ArrayList<DetectedObject> objects;  // List of detected objects
+    private final StampedDetectedObjects obj;  // List of detected objects
 
-    public DetectObjectsEvent(int time, ArrayList<DetectedObject> objects) {
+
+    public DetectObjectsEvent(int time, StampedDetectedObjects obj) {
         this.time = time;
-        this.objects = objects;
+        this.obj = obj;
     }
 
     public int getTime() {
         return time;
     }
 
-    public List<DetectedObject> getObjects() {
-        return objects;
+    public StampedDetectedObjects getObjects() {
+        return obj;
     }
 }
