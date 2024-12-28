@@ -1,5 +1,10 @@
 package bgu.spl.mics.application.objects;
 
+import java.util.ArrayList;
+
+import bgu.spl.mics.application.messages.DetectObjectsEvent;
+import bgu.spl.mics.application.messages.TrackedObjectsEvent;
+
 /**
  * LiDarWorkerTracker is responsible for managing a LiDAR worker.
  * It processes DetectObjectsEvents and generates TrackedObjectsEvents by using data from the LiDarDataBase.
@@ -7,5 +12,55 @@ package bgu.spl.mics.application.objects;
  */
 public class LiDarWorkerTracker {
 
-    // TODO: Define fields and methods.
+    private final int id; // The ID of the LiDar
+    private final int frequency; // The time interval at which the LiDar sends new events
+    private STATUS status; // The status of the LiDar
+    private ArrayList<TrackedObject> lastTrackedObjects; // The last objects the LiDar tracked
+
+    public LiDarWorkerTracker(int id, int frequency, STATUS status, ArrayList<TrackedObject> lastTrackedObjects) {
+        this.id = id;
+        this.frequency = frequency;
+        this.status = status;
+        this.lastTrackedObjects = lastTrackedObjects;
+    }
+
+
+    public int getId() {
+        return id;
+    }
+
+    public int getFrequency() {
+        return frequency;
+    }
+
+    public STATUS getStatus() {
+        return status;
+    }
+
+    public ArrayList<TrackedObject> getLastTrackedObjects() {
+        return lastTrackedObjects;
+    }
+
+    // Setter for status
+    public void setStatus(STATUS status) {
+        this.status = status;
+    }
+
+    // Setter for lastTrackedObjects (if needed)
+    public void setLastTrackedObjects(ArrayList<TrackedObject> lastTrackedObjects) {
+        this.lastTrackedObjects = lastTrackedObjects;
+    }
+
+    public TrackedObjectsEvent handleDetecTrackedObjectsEvent(DetectObjectsEvent det, int currTime){
+        ArrayList<TrackedObject> trackedObjects = new ArrayList<>();
+        ArrayList<StampedCloudPoints> objects_at_time  = LiDarDataBase.getInstance().getMapTimeHashMap().get(currTime);
+        TrackedObject track;
+        for(DetectedObject obj : det.getObjects()){
+            //
+            //trackedObjects.add(new TrackedObject(obj.getId(), obj.getDescription(), );
+        }
+
+        return  new TrackedObjectsEvent(trackedObjects);
+    }
+    
 }

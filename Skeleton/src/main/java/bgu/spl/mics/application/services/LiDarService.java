@@ -1,6 +1,11 @@
 package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.messages.CrashedBroadcast;
+import bgu.spl.mics.application.messages.DetectObjectsEvent;
+import bgu.spl.mics.application.messages.TerminatedBroadcast;
+import bgu.spl.mics.application.messages.TickBroadcast;
+import bgu.spl.mics.application.messages.TrackedObjectsEvent;
 import bgu.spl.mics.application.objects.DetectedObject;
 import bgu.spl.mics.application.objects.LiDarWorkerTracker;
 
@@ -14,15 +19,15 @@ import bgu.spl.mics.application.objects.LiDarWorkerTracker;
  */
 public class LiDarService extends MicroService {
 
-    
+    LiDarWorkerTracker liDarTracker;    
     /**
      * Constructor for LiDarService.
      *
      * @param liDarTracker The LiDAR tracker object that this service will use to process data.
      */
     public LiDarService(LiDarWorkerTracker liDarTracker) {
-        super("Change_This_Name");
-        // TODO Implement this
+        super("Lidar");
+        this.liDarTracker = liDarTracker;
     }
 
     /**
@@ -32,6 +37,30 @@ public class LiDarService extends MicroService {
      */
     @Override
     protected void initialize() {
-        
+        //The LiDarWorker gets the X’s,Y’s coordinates from the DataBase of them and sends a new TrackedObjectsEvent to the Fusion (can be multiple events).
+        // Subscribes to TickBroadcast, TerminatedBroadcast, CrashedBroadcast, DetectObjectsEvent.
+        subscribeBroadcast(TickBroadcast.class, (TickBroadcast c) -> {
+            //how to handle tick?
+
+        });
+
+
+        subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast c) -> {
+            terminate();
+        });
+
+
+        subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast c) -> {
+            terminate(); //both of TerminatedBroadcast and CrashedBroadcast are leading to termination?
+        });
+
+        subscribeEvent(DetectObjectsEvent.class, (DetectObjectsEvent c) -> { 
+            //The LiDarWorker gets the X’s,Y’s coordinates from the DataBase of them and sends a new TrackedObjectsEvent to the Fusion.
+            // After the LiDar Worker completes the event, it saves the coordinates in the lastObjects variable in DataBase and sends True value to the Camera.
+            TrackedObjectsEvent eve;
+            for (DetectedObject obj : c.getObjects()){
+                
+            }
+        });
     }
 }

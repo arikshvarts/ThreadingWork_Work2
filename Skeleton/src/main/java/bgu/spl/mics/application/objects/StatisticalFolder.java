@@ -13,7 +13,15 @@ import java.util.concurrent.atomic.AtomicInteger;
         private AtomicInteger numTrackedObjects;
         private AtomicInteger numLandmarks;
         
-    
+    // Singleton instance    
+        private static class StatisticalFolderHelper {
+            private static final StatisticalFolder INSTANCE = new StatisticalFolder();
+        }
+
+        public static StatisticalFolder getInstance() {
+            return StatisticalFolderHelper.INSTANCE;
+        }
+
         public  void updateRuntime(int ticks) {//synchronized maybe?
             this.systemRuntime = ticks;
         }
