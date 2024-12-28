@@ -35,18 +35,16 @@ public class TimeService extends MicroService {
     @Override
     protected void initialize() {
 
-        messageCallBack.putIfAbsent(TerminatedBroadcast.class, (TerminatedBroadcast c) -> {
+        subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast) ->
+        {
             terminate();
         });
 
-        subscribeBroadcast(TerminatedBroadcast.class, (Callback<TerminatedBroadcast>) messageCallBack.get(TerminatedBroadcast.class));
-
-        messageCallBack.putIfAbsent(CrashedBroadcast.class, (CrashedBroadcast c) -> {
-            terminate(); //both of TerminatedBroadcast and CrashedBroadcast are leading to termination?
+        subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast) ->
+        {
+            terminate();
         });
-
-        subscribeBroadcast(CrashedBroadcast.class, (Callback<CrashedBroadcast>) messageCallBack.get(CrashedBroadcast.class));
-
+    
         while (currentTick < totalTicks) {
             // Broadcast the current tick to all subscribed microservices
             sendBroadcast(new TickBroadcast(currentTick));
