@@ -50,17 +50,19 @@ public class LiDarWorkerTracker {
     public void setLastTrackedObjects(ArrayList<TrackedObject> lastTrackedObjects) {
         this.lastTrackedObjects = lastTrackedObjects;
     }
-
-    public TrackedObjectsEvent handleDetecTrackedObjectsEvent(DetectObjectsEvent det, int currTime){
+    
+    public TrackedObjectsEvent handleDetectedObjectsEvent(DetectObjectsEvent det){
         ArrayList<TrackedObject> trackedObjects = new ArrayList<>();
-        ArrayList<StampedCloudPoints> objects_at_time  = LiDarDataBase.getInstance().getMapTimeHashMap().get(currTime);
-        TrackedObject track;
-        for(DetectedObject obj : det.getObjects()){
-            //
-            //trackedObjects.add(new TrackedObject(obj.getId(), obj.getDescription(), );
+        ArrayList<StampedCloudPoints> objects_at_time  = LiDarDataBase.getInstance().getMapTimeHashMap().get(det.getTime());
+        for(StampedCloudPoints tracked : objects_at_time){
+            //need to continue and find from all tracked in this time in the hash, only yhe objects detected from camera
+            for(DetectedObject obj : det.getObjects()){
+                if(obj.getId() == tracked.getId()){
+                    trackedObjects.add(new TrackedObject(tracked.getId(), obj.getDescription(), tracked.getCloudPoints(), det.getTime()));
+                }
+            }
         }
-
-        return  new TrackedObjectsEvent(trackedObjects);
+        return(new TrackedObjectsEvent(trackedObjects));
     }
     
 }

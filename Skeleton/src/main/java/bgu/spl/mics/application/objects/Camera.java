@@ -79,15 +79,6 @@ public class Camera {
     public DetectObjectsEvent handleTick(int currTime) {
         for (StampedDetectedObjects data : CameraData) {
             if (data.getTime() == currTime - frequency) {
-                //we detected objects at tick-frequency
-                // for (DetectedObject obj : data.getDetectedObjects()) {
-                    //the logic is to check for each object the camera detected now if it didn't detect untill now
-                    //add it to allOjects in the Statsanager and increment num of detected objects
-                    
-                    // if (StatsManager.getAllObjects().contains(obj) == false) {
-                    //     StatsManager.getAllObjects().add(obj);
-                    //     statsFolder.incrementDetectedObjects(1);
-                    // }
                     
                 return new DetectObjectsEvent(currTime, data.getDetectedObjects());
             }

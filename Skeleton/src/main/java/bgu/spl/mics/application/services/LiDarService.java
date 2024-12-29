@@ -51,16 +51,14 @@ public class LiDarService extends MicroService {
 
 
         subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast c) -> {
-            terminate(); //both of TerminatedBroadcast and CrashedBroadcast are leading to termination?
+            terminate(); //when recieving a CrashedBroadcast from another objects, each service stops immediately
         });
 
         subscribeEvent(DetectObjectsEvent.class, (DetectObjectsEvent c) -> { 
             //The LiDarWorker gets the X’s,Y’s coordinates from the DataBase of them and sends a new TrackedObjectsEvent to the Fusion.
             // After the LiDar Worker completes the event, it saves the coordinates in the lastObjects variable in DataBase and sends True value to the Camera.
             TrackedObjectsEvent eve;
-            for (DetectedObject obj : c.getObjects()){
-                
-            }
+            liDarTracker.handleDetectedObjectsEvent(c);          
         });
     }
 }

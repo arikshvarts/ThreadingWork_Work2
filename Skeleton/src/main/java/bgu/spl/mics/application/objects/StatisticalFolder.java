@@ -26,15 +26,15 @@ import java.util.concurrent.atomic.AtomicInteger;
             this.systemRuntime = ticks;
         }
     
-        public  void incrementDetectedObjects(int add) {
+        public synchronized void incrementDetectedObjects(int add) {
             this.numDetectedObjects.addAndGet(add);
         }
     
-        public  void incrementTrackedObjects(int add) {
+        public synchronized void incrementTrackedObjects(int add) {
             this.numTrackedObjects.addAndGet(add);
         }
     
-        public  void incrementLandmarks(int add) {
+        public synchronized void incrementLandmarks(int add) {
             this.numLandmarks.addAndGet(add);
         }
     

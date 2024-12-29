@@ -8,6 +8,7 @@ import bgu.spl.mics.application.messages.DetectObjectsEvent;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.objects.Camera;
+import bgu.spl.mics.application.objects.STATUS;
 import bgu.spl.mics.application.objects.StatisticalFolder;
 
 /**
@@ -41,7 +42,9 @@ public class CameraService extends MicroService {
      */
     @Override
     protected void initialize() {
-
+        if(camera.getStatus() == STATUS.ERROR){
+            sendBroadcast(new CrashedBroadcast(getName(), "Error in the sensor"));
+        }
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast c) -> {
             DetectObjectsEvent eve = camera.handleTick(c.getCurrentTick());
             if (eve != null) {
@@ -51,7 +54,7 @@ public class CameraService extends MicroService {
                 if (fut.get() == false) {
                     sendBroadcast(new CrashedBroadcast(getName(), "Failure occurred while processing DetectObjectsEvent."));
                 }
-                if (fut == null) { //msd_nus.sendEvent can also return null
+                if (fut == null) { //sendEvent can also return null
                     System.err.println("No service is available to handle the DetectObjectsEvent.");
                     return;
                 }
@@ -65,7 +68,7 @@ public class CameraService extends MicroService {
 
 
         subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast c) -> {
-            terminate(); //both of TerminatedBroadcast and CrashedBroadcast are leading to termination?
+            
         });
 
     }
