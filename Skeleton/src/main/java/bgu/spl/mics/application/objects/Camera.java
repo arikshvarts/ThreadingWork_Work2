@@ -9,7 +9,6 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import bgu.spl.mics.StatsManager;
 import bgu.spl.mics.application.messages.DetectObjectsEvent;
 
 public class Camera {
@@ -20,7 +19,9 @@ public class Camera {
     private final ArrayList<StampedDetectedObjects> detectedObjectsList;
     private final String dataFilePath; //the path to this camera data we have as a string in the Configuration JSON File
     private final ArrayList<StampedDetectedObjects> CameraData;
-    StatisticalFolder statsFolder = StatsManager.getStatsFolder();
+    private final int last_detected_time;
+
+
 
     public Camera(int id, int frequency, STATUS status, String dataFilePath) {
         this.id = id;
@@ -29,6 +30,8 @@ public class Camera {
         this.detectedObjectsList = new ArrayList<>();
         this.dataFilePath = dataFilePath;
         this.CameraData = parseCameraData();
+        this.last_detected_time = getCameraData().get(getCameraData().size() - 1).getTime();
+
 
     }
 
@@ -64,6 +67,10 @@ public class Camera {
         detectedObjectsList.add(new StampedDetectedObjects(time, detectedObjects));
     }
 
+    public int get_last_detected_time(){
+        return last_detected_time;
+    }
+
     //parsing from camera_data.json
     private ArrayList<StampedDetectedObjects> parseCameraData() {
         try (FileReader reader = new FileReader(dataFilePath)) {
@@ -80,21 +87,16 @@ public class Camera {
     public DetectObjectsEvent handleTick(int currTime) {
         for (StampedDetectedObjects data : CameraData) {
             if (data.getTime() == currTime - frequency) {
-                //we detected objects at tick-frequency
-                for (DetectedObject obj : data.getDetectedObjects()) {
-                    //the logic is to check for each object the camera detected now if it didn't detect untill now
-                    //add it to allOjects in the Statsanager and increment num of detected objects
-                    if (StatsManager.getAllObjects().contains(obj) == false) {
-                        StatsManager.getAllObjects().add(obj);
-                        statsFolder.incrementDetectedObjects();
-                    }
-
-                }
+                    
                 return new DetectObjectsEvent(currTime, data.getDetectedObjects());
             }
             // Return an empty List if there are no objects that detected at this time
         }
         return new DetectObjectsEvent(currTime, new ArrayList<>());
+    }
+
+    public ArrayList<StampedDetectedObjects> getCameraData(){
+        return CameraData;
     }
 
     @Override

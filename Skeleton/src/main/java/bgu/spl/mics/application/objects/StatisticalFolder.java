@@ -1,4 +1,4 @@
-    package bgu.spl.mics.application.objects;
+package bgu.spl.mics.application.objects;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -13,20 +13,28 @@ import java.util.concurrent.atomic.AtomicInteger;
         private AtomicInteger numTrackedObjects;
         private AtomicInteger numLandmarks;
         
-    
-        public  void updateRuntime(int ticks) {//synchronized maybe?
+    // Singleton instance    
+        private static class StatisticalFolderHelper {
+            private static final StatisticalFolder INSTANCE = new StatisticalFolder();
+        }
+
+        public static StatisticalFolder getInstance() {
+            return StatisticalFolderHelper.INSTANCE;
+        }
+
+        public void updateRuntime(int ticks) {//synchronized maybe?
             this.systemRuntime = ticks;
         }
     
-        public  void incrementDetectedObjects(int add) {
+        public void incrementDetectedObjects(int add) {
             this.numDetectedObjects.addAndGet(add);
         }
     
-        public  void incrementTrackedObjects(int add) {
+        public void incrementTrackedObjects(int add) {
             this.numTrackedObjects.addAndGet(add);
         }
     
-        public  void incrementLandmarks(int add) {
+        public void incrementLandmarks(int add) {
             this.numLandmarks.addAndGet(add);
         }
     
