@@ -31,9 +31,13 @@ public class LiDarService extends MicroService {
     ArrayList<TrackedObjectsEvent> events_to_send = new ArrayList<>();
     //leshanoy im meshanin Pirsor MehaLidarDataBase
     int last_detected_time = LiDarDataBase.getInstance().getCloudPoints().get(LiDarDataBase.getInstance().getCloudPoints().size() - 1).getTime();
+    private StatisticalFolder stat;
+
+    
     public LiDarService(LiDarWorkerTracker liDarTracker) {
         super("Lidar");
         this.liDarTracker = liDarTracker;
+        this.stat = StatisticalFolder.getInstance();
     }
 
     /**
@@ -64,6 +68,7 @@ public class LiDarService extends MicroService {
                         for(TrackedObjectsEvent eve : events_to_send) { //looping all proccessed events and check if ready to send
                             if(c.getCurrentTick() >= eve.getTime() + liDarTracker.getFrequency()){
                                 //currTick > eve.time + freq  if the camera frequency greater than lidar frequency
+                                stat.incrementTrackedObjects(eve.getTrackedObjects().size());
                                 sendEvent(eve);
                                 events_to_send.remove(eve);
                             }

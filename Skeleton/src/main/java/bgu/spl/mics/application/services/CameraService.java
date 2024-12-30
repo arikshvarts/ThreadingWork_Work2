@@ -23,6 +23,7 @@ public class CameraService extends MicroService {
 
     private final Camera camera;
     private final int last_detected_time;
+    private StatisticalFolder stat;
     // private int last_tick_detected;
 
     /**
@@ -36,6 +37,7 @@ public class CameraService extends MicroService {
         this.camera = camera;
         //leshanot barega shehapirsor over mitoch hacemra lemakom aher
         this.last_detected_time = camera.getCameraData().get(camera.getCameraData().size() - 1).getTime();
+        this.stat = StatisticalFolder.getInstance();
     }
 
     /**
@@ -75,8 +77,7 @@ public class CameraService extends MicroService {
                             break;
                         }
                     }
-                    //there is not object ERROR
-                    statsManager.incrementDetectedObjects(eve.getObjects().size()); //according to the assignment forum, numDetectedObjects the total detecting and not unique objects
+                    stat.incrementDetectedObjects(eve.getObjects().size());
                     Future<Boolean> fut = MessageBusImpl.getInstance().sendEvent(eve);
                     if (fut.get() == false) {
                         sendBroadcast(new CrashedBroadcast(getName(), "Failure occurred while processing DetectObjectsEvent."));
