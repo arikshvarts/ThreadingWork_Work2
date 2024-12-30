@@ -1,11 +1,6 @@
 package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.MicroService;
-import bgu.spl.mics.application.messages.CrashedBroadcast;
-import bgu.spl.mics.application.messages.DetectObjectsEvent;
-import bgu.spl.mics.application.messages.TerminatedBroadcast;
-import bgu.spl.mics.application.messages.TickBroadcast;
-import bgu.spl.mics.application.messages.TrackedObjectsEvent;
 import bgu.spl.mics.application.objects.DetectedObject;
 import bgu.spl.mics.application.objects.LiDarWorkerTracker;
 
@@ -19,15 +14,15 @@ import bgu.spl.mics.application.objects.LiDarWorkerTracker;
  */
 public class LiDarService extends MicroService {
 
-    LiDarWorkerTracker liDarTracker;    
+    
     /**
      * Constructor for LiDarService.
      *
      * @param liDarTracker The LiDAR tracker object that this service will use to process data.
      */
     public LiDarService(LiDarWorkerTracker liDarTracker) {
-        super("Lidar");
-        this.liDarTracker = liDarTracker;
+        super("Change_This_Name");
+        // TODO Implement this
     }
 
     /**
@@ -37,6 +32,7 @@ public class LiDarService extends MicroService {
      */
     @Override
     protected void initialize() {
+<<<<<<< HEAD
         //The LiDarWorker gets the X’s,Y’s coordinates from the DataBase of them and sends a new TrackedObjectsEvent to the Fusion (can be multiple events).
         // Subscribes to TickBroadcast, TerminatedBroadcast, CrashedBroadcast, DetectObjectsEvent.
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast c) -> {
@@ -60,5 +56,8 @@ public class LiDarService extends MicroService {
             TrackedObjectsEvent eve;
             liDarTracker.handleDetectedObjectsEvent(c);          
         });
+=======
+        
+>>>>>>> parent of 015e846 (my work on cameras lidar and statistical from shabat)
     }
 }

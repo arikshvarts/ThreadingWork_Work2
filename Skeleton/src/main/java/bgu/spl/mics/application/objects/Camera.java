@@ -9,6 +9,7 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import bgu.spl.mics.StatsManager;
 import bgu.spl.mics.application.messages.DetectObjectsEvent;
 
 public class Camera {
@@ -19,7 +20,7 @@ public class Camera {
     private final ArrayList<StampedDetectedObjects> detectedObjectsList;
     private final String dataFilePath; //the path to this camera data we have as a string in the Configuration JSON File
     private final ArrayList<StampedDetectedObjects> CameraData;
-
+    StatisticalFolder statsFolder = StatsManager.getStatsFolder();
 
     public Camera(int id, int frequency, STATUS status, String dataFilePath) {
         this.id = id;
@@ -79,7 +80,20 @@ public class Camera {
     public DetectObjectsEvent handleTick(int currTime) {
         for (StampedDetectedObjects data : CameraData) {
             if (data.getTime() == currTime - frequency) {
+<<<<<<< HEAD
                     
+=======
+                //we detected objects at tick-frequency
+                for (DetectedObject obj : data.getDetectedObjects()) {
+                    //the logic is to check for each object the camera detected now if it didn't detect untill now
+                    //add it to allOjects in the Statsanager and increment num of detected objects
+                    if (StatsManager.getAllObjects().contains(obj) == false) {
+                        StatsManager.getAllObjects().add(obj);
+                        statsFolder.incrementDetectedObjects();
+                    }
+
+                }
+>>>>>>> parent of 015e846 (my work on cameras lidar and statistical from shabat)
                 return new DetectObjectsEvent(currTime, data.getDetectedObjects());
             }
             // Return an empty List if there are no objects that detected at this time

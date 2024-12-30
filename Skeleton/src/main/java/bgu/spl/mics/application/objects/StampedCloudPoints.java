@@ -17,12 +17,9 @@ public class StampedCloudPoints {
         this.id = id;
         this.time = time;
         this.cloudPoints = cloudPoints;
-        }
-
-    public String getId() {
-        return id;
     }
 
+<<<<<<< HEAD
     public int getTime() {
         return time;
     }
@@ -32,4 +29,6 @@ public class StampedCloudPoints {
     }
     
 
+=======
+>>>>>>> parent of 015e846 (my work on cameras lidar and statistical from shabat)
     }
