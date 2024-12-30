@@ -4,7 +4,6 @@ import bgu.spl.mics.Broadcast;
 public class CrashedBroadcast implements Broadcast {
     private final String faultyServiceName;
     private final String errorMessage;
-    
 
     public CrashedBroadcast(String faultyServiceName, String errorMessage) {
         this.faultyServiceName = faultyServiceName;
