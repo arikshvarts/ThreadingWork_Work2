@@ -19,6 +19,8 @@ public class Camera {
     private final ArrayList<StampedDetectedObjects> detectedObjectsList;
     private final String dataFilePath; //the path to this camera data we have as a string in the Configuration JSON File
     private final ArrayList<StampedDetectedObjects> CameraData;
+    private final int last_detected_time;
+
 
 
     public Camera(int id, int frequency, STATUS status, String dataFilePath) {
@@ -28,6 +30,8 @@ public class Camera {
         this.detectedObjectsList = new ArrayList<>();
         this.dataFilePath = dataFilePath;
         this.CameraData = parseCameraData();
+        this.last_detected_time = getCameraData().get(getCameraData().size() - 1).getTime();
+
 
     }
 
@@ -63,6 +67,10 @@ public class Camera {
         detectedObjectsList.add(new StampedDetectedObjects(time, detectedObjects));
     }
 
+    public int get_last_detected_time(){
+        return last_detected_time;
+    }
+
     //parsing from camera_data.json
     private ArrayList<StampedDetectedObjects> parseCameraData() {
         try (FileReader reader = new FileReader(dataFilePath)) {
@@ -85,6 +93,10 @@ public class Camera {
             // Return an empty List if there are no objects that detected at this time
         }
         return new DetectObjectsEvent(currTime, new ArrayList<>());
+    }
+
+    public ArrayList<StampedDetectedObjects> getCameraData(){
+        return CameraData;
     }
 
     @Override
