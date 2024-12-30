@@ -38,7 +38,6 @@ public class CameraService extends MicroService {
         //leshanot barega shehapirsor over mitoch hacemra lemakom aher
         this.last_detected_time = camera.getCameraData().get(camera.getCameraData().size() - 1).getTime();
         this.stat = StatisticalFolder.getInstance();
-
     }
 
     /**
