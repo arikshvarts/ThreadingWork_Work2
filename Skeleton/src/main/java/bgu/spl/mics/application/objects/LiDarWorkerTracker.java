@@ -62,7 +62,7 @@ public class LiDarWorkerTracker {
                 }
             }
         }
-        return(new TrackedObjectsEvent(trackedObjects, det.getTime()));
+        return(new TrackedObjectsEvent(trackedObjects));
     }
     
 }
