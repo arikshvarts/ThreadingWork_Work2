@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.services;
 import bgu.spl.mics.application.messages.TickBroadcast;
+import bgu.spl.mics.application.objects.StatisticalFolder;
 import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.Callback;
@@ -49,6 +50,7 @@ public class TimeService extends MicroService {
             // Broadcast the current tick to all subscribed microservices
             sendBroadcast(new TickBroadcast(currentTick));
             currentTick++;
+            StatisticalFolder.getInstance().updateRuntime(StatisticalFolder.getInstance().getSystemRuntime()+1);
             try {
                 // Simulate the passage of time for this tick
                 Thread.sleep(tickDuration);

@@ -9,13 +9,11 @@ import java.util.ArrayList;
  */
 public class GPSIMU {
     private int currentTick;
-    private STATUS status;
     private ArrayList<Pose> PoseList;
 
     public GPSIMU() {
         this.currentTick = 0;
-        this.status =STATUS.UP; ; // check if true
-        this.PoseList = new ArrayList<>();
+        this.PoseList = new ArrayList<Pose>();
     }
 
     public int getCurrentTick() {
@@ -26,13 +24,6 @@ public class GPSIMU {
         this.currentTick = currentTick;
     }
 
-    public STATUS getStatus() {
-        return status;
-    }
-
-    public void setStatus(STATUS status) {
-        this.status = status;
-    }
 
     public ArrayList<Pose> getPoseList() {
         return PoseList;
@@ -42,7 +33,7 @@ public class GPSIMU {
         this.PoseList = poseList;
     }
 
-    public Pose getTickAtTime(ArrayList<Pose> poseList) {
+    public Pose getTickAtTime() {
         return this.PoseList.get(this.currentTick);
     }
 }
