@@ -37,11 +37,6 @@ public class TimeService extends MicroService {
     protected void initialize() {
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast) ->
         {
-            // if (currentTick == 0) {
-            //     // Signal termination after all ticks are completed
-            //     sendBroadcast(new TickBroadcast(currentTick));
-            // }
-      
             sendBroadcast(new TickBroadcast(currentTick));
             currentTick++;
             StatisticalFolder.getInstance().updateRuntime(1);
@@ -58,6 +53,7 @@ public class TimeService extends MicroService {
                 terminate();
             }
 });
+sendBroadcast(new TickBroadcast(currentTick));
         }
     }
         
