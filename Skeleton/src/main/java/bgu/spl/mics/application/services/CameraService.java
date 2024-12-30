@@ -34,6 +34,7 @@ public class CameraService extends MicroService {
     public CameraService(Camera camera) {
         super("Camera");
         this.camera = camera;
+        //leshanot barega shehapirsor over mitoch hacemra lemakom aher
         this.last_detected_time = camera.getCameraData().get(camera.getCameraData().size() - 1).getTime();
     }
 
@@ -45,11 +46,13 @@ public class CameraService extends MicroService {
     protected void initialize() {
         if(camera.getStatus() == STATUS.ERROR){
             sendBroadcast(new CrashedBroadcast(getName(), "Error in the sensor"));
+            terminate();
+            //if when we get the service its STATUS is ERROR, send crashedBroadcast and terminate
         }
         
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast c) -> {
-        if(c.getCurrentTick() < camera.get_last_detected_time())   {
-            //
+        if(c.getCurrentTick() < camera.get_last_detected_time() + camera.getFrequency())   {
+            //stop after last time you detected something + the frequency
             camera.setStatus(STATUS.DOWN);
                 terminate();
         }
@@ -63,11 +66,12 @@ public class CameraService extends MicroService {
                 }
                 DetectObjectsEvent eve = camera.handleTick(c.getCurrentTick());
                 if (eve != null) {
-                    //if() send only if frequency delay passed
+                    //send only if frequency delay passed (handeled by handle tick)
                     for(DetectedObject det : eve.getObjects()){
                         if (det.getId() == "ERROR"){
                             camera.setStatus(STATUS.ERROR);
                             sendBroadcast(new CrashedBroadcast(det.getId(), "this item is error"));
+                            terminate();
                             break;
                         }
                     }

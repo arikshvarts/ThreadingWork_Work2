@@ -30,6 +30,7 @@ public class Camera {
         this.detectedObjectsList = new ArrayList<>();
         this.dataFilePath = dataFilePath;
         this.CameraData = parseCameraData();
+        //leshanot barega shehapirsor over mitoch hacemra lemakom aher. laadcen how last detected time  gets its value
         this.last_detected_time = getCameraData().get(getCameraData().size() - 1).getTime();
 
 
@@ -86,6 +87,7 @@ public class Camera {
 
     public DetectObjectsEvent handleTick(int currTime) {
         for (StampedDetectedObjects data : CameraData) {
+            //send only if frequency delay passed
             if (data.getTime() == currTime - frequency) {
                     
                 return new DetectObjectsEvent(currTime, data.getDetectedObjects());
