@@ -3,17 +3,16 @@ package bgu.spl.mics.application.services;
 import java.util.ArrayList;
 
 import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.ErrorInfo;
 import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.DetectObjectsEvent;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.messages.TrackedObjectsEvent;
-import bgu.spl.mics.application.objects.DetectedObject;
 import bgu.spl.mics.application.objects.LiDarDataBase;
 import bgu.spl.mics.application.objects.LiDarWorkerTracker;
 import bgu.spl.mics.application.objects.STATUS;
 import bgu.spl.mics.application.objects.StatisticalFolder;
-import bgu.spl.mics.application.objects.LiDarDataBase;
 
 
 /**
@@ -32,12 +31,15 @@ public class LiDarService extends MicroService {
     //leshanoy im meshanin Pirsor MehaLidarDataBase
     int last_detected_time = LiDarDataBase.getInstance().getCloudPoints().get(LiDarDataBase.getInstance().getCloudPoints().size() - 1).getTime();
     private StatisticalFolder stat;
+    TrackedObjectsEvent last_frame; //in the ERROR output file we will use it for extracting the time and the objects
 
     
     public LiDarService(LiDarWorkerTracker liDarTracker) {
         super("Lidar");
         this.liDarTracker = liDarTracker;
         this.stat = StatisticalFolder.getInstance();
+        this.last_frame = null;
+
 
     }
 
@@ -58,7 +60,7 @@ public class LiDarService extends MicroService {
 
 
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast c) -> {
-                      if(c.getCurrentTick() < last_detected_time + liDarTracker.getFrequency())   {
+                      if(c.getCurrentTick() > last_detected_time + liDarTracker.getFrequency())   {
             //stop after last time you detected something + the frequency
             liDarTracker.setStatus(STATUS.DOWN);
                 terminate();
@@ -70,6 +72,7 @@ public class LiDarService extends MicroService {
                             if(c.getCurrentTick() >= eve.getTime() + liDarTracker.getFrequency()){
                                 //currTick > eve.time + freq  if the camera frequency greater than lidar frequency
                                 stat.incrementTrackedObjects(eve.getTrackedObjects().size());
+                                last_frame = eve; // the last time the camera processed the envirmoent, it means, what the camera saw at currTime - frequency
                                 sendEvent(eve);
                                 events_to_send.remove(eve);
                             }
@@ -89,6 +92,7 @@ public class LiDarService extends MicroService {
 
 
         subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast c) -> {
+            ErrorInfo.getInstance().AddLidarsLastFrames(last_frame); //updating the last frame to the ErrorInfo
             terminate(); //when recieving a CrashedBroadcast from another objects, each service stops immediately
         });
 

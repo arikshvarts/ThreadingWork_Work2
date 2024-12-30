@@ -1,6 +1,5 @@
 package bgu.spl.mics.application;
 
-import bgu.spl.mics.StatsManager;
 
 /**
  * The main entry point for the GurionRock Pro Max Ultra Over 9000 simulation.
@@ -22,7 +21,6 @@ public class GurionRockRunner {
     public static void main(String[] args) {
 //implement countdownlatch so the tick will start only after initiallize of everyone
 
-        StatsManager.initialize();
 
     }
 }
