@@ -35,35 +35,31 @@ public class TimeService extends MicroService {
      */
     @Override
     protected void initialize() {
-
-        subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast) ->
+        subscribeBroadcast(TickBroadcast.class, (TickBroadcast) ->
         {
-            terminate();
-        });
-
-        subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast) ->
-        {
-            terminate();
-        });
-    
-        while (currentTick < totalTicks) {
-            // Broadcast the current tick to all subscribed microservices
+            // if (currentTick == 0) {
+            //     // Signal termination after all ticks are completed
+            //     sendBroadcast(new TickBroadcast(currentTick));
+            // }
+      
             sendBroadcast(new TickBroadcast(currentTick));
             currentTick++;
             StatisticalFolder.getInstance().updateRuntime(1);
             try {
                 // Simulate the passage of time for this tick
-                Thread.sleep(tickDuration);
+                Thread.sleep(tickDuration*1000);
             } catch (InterruptedException e) {
                 // Handle interruption and terminate the service
                 Thread.currentThread().interrupt();
-                break;
+            }  
+            if (currentTick == totalTicks) {
+                // Signal termination after all ticks are completed
+                sendBroadcast(new TerminatedBroadcast("TimeService"));
+                terminate();
             }
+});
         }
-        // Signal termination after all ticks are completed
-        sendBroadcast(new TerminatedBroadcast("TimeService"));
-        terminate();
+    }
         
 
-    }
-}
+    

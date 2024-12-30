@@ -36,7 +36,7 @@ public class CameraService extends MicroService {
         super("Camera");
         this.camera = camera;
         this.last_detected_time = camera.getCameraData().get(camera.getCameraData().size() - 1).getTime();
-        StatisticalFolder stat = StatisticalFolder.getInstance();
+        this.stat = StatisticalFolder.getInstance();
     }
 
     /**
