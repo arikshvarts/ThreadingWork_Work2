@@ -2,6 +2,7 @@ package bgu.spl.mics.application.objects;
 
 import java.util.ArrayList;
 
+import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.DetectObjectsEvent;
 import bgu.spl.mics.application.messages.TrackedObjectsEvent;
 
@@ -57,6 +58,11 @@ public class LiDarWorkerTracker {
         for(StampedCloudPoints tracked : objects_at_time){
             //need to continue and find from all tracked in this time in the hash, only yhe objects detected from camera
             for(DetectedObject obj : det.getObjects()){
+                if(tracked.getId() == "ERROR"){
+                    //if tracked object with id = ERROR
+                    setStatus(STATUS.ERROR);
+                    break;
+                }
                 if(obj.getId() == tracked.getId()){
                     trackedObjects.add(new TrackedObject(tracked.getId(), obj.getDescription(), tracked.getCloudPoints(), det.getTime()));
                 }
