@@ -28,7 +28,7 @@ public class FusionSlamService extends MicroService {
      */
     public FusionSlamService(FusionSlam fusionSlam) {
         super("Change_This_Name");
-        FusionSlam fusionSlam = new FusionSlam();
+        fusionSlam = FusionSlam.getInstance();
     }
 
     /**
@@ -38,35 +38,22 @@ public class FusionSlamService extends MicroService {
      */
     @Override
     protected void initialize() {
-
-
-//         to TickBroadcast, TrackedObjectsEvent, PoseEvent, ,
-// CrashedBroadcast.
-
-
-
-        subscribeEvent(TrackedObjectsEvent.class,(TrackedObjectsEvent)->{
-
+        subscribeEvent(TrackedObjectsEvent.class,(TrackedObjectsEvent)  ->{
+            fusionSlam.processObjectsAtTime(TrackedObjectsEvent.getTrackedObjects(),TrackedObjectsEvent.getTime());
         });
 
-
-        subscribeEvent(PoseEvent.class,(PoseEvent)->{
-            PoseEvent.getPose
+        subscribeEvent(PoseEvent.class,(PoseEvent) ->{
+            fusionSlam.addPose(PoseEvent.getPose());
         });
 
-        subscribeBroadcast(TickBroadcast.class,(TickBroadcast)->{
+        subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast) ->
+        {
+            terminate();
+        });
 
-         });
-
-       subscribeBroadcast(TerminatedBroadcast.class,(TerminatedBroadcast)->
-       {
-              terminate(); 
-       });
-
-
-       subscribeBroadcast(CrashedBroadcast.class,(subscribeBroadcast)->
-       {
-              terminate(); 
-       });
+        subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast) ->
+        {
+            terminate();
+        });
         }
 }

@@ -72,7 +72,7 @@ public class CameraService extends MicroService {
                         }
                     }
                     //there is not object ERROR
-                    statsFolder.incrementDetectedObjects(eve.getObjects().size()); //according to the assignment forum, numDetectedObjects the total detecting and not unique objects
+                    statsManager.incrementDetectedObjects(eve.getObjects().size()); //according to the assignment forum, numDetectedObjects the total detecting and not unique objects
                     Future<Boolean> fut = MessageBusImpl.getInstance().sendEvent(eve);
                     if (fut.get() == false) {
                         sendBroadcast(new CrashedBroadcast(getName(), "Failure occurred while processing DetectObjectsEvent."));
