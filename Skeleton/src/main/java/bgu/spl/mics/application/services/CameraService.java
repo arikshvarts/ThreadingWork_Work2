@@ -1,6 +1,5 @@
 package bgu.spl.mics.application.services;
 
-import bgu.spl.mics.Callback;
 import bgu.spl.mics.Future;
 import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
@@ -9,6 +8,9 @@ import bgu.spl.mics.application.messages.DetectObjectsEvent;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.objects.Camera;
+import bgu.spl.mics.application.objects.DetectedObject;
+import bgu.spl.mics.application.objects.STATUS;
+import bgu.spl.mics.application.objects.StatisticalFolder;
 
 /**
  * CameraService is responsible for processing data from the camera and sending
@@ -20,6 +22,7 @@ import bgu.spl.mics.application.objects.Camera;
 public class CameraService extends MicroService {
 
     private final Camera camera;
+    private final int last_detected_time;
     // private int last_tick_detected;
 
     /**
@@ -31,7 +34,7 @@ public class CameraService extends MicroService {
     public CameraService(Camera camera) {
         super("Camera");
         this.camera = camera;
-
+        this.last_detected_time = camera.getCameraData().get(camera.getCameraData().size() - 1).getTime();
     }
 
     /**
@@ -40,34 +43,59 @@ public class CameraService extends MicroService {
      */
     @Override
     protected void initialize() {
-        //update relevant callbacks into the messageCallBack hashmap
-        messageCallBack.putIfAbsent(TickBroadcast.class, (TickBroadcast c) -> {
-            DetectObjectsEvent eve = camera.handleTick(c.getCurrentTick());
-            if (eve != null) {
-                //if() send only if frequency delay passed
-                Future<Boolean> fut = MessageBusImpl.getInstance().sendEvent(eve);
-                if (fut.get() == false) {
-                    sendBroadcast(new CrashedBroadcast(getName(), "Failure occurred while processing DetectObjectsEvent."));
+        if(camera.getStatus() == STATUS.ERROR){
+            sendBroadcast(new CrashedBroadcast(getName(), "Error in the sensor"));
+        }
+        
+        subscribeBroadcast(TickBroadcast.class, (TickBroadcast c) -> {
+        if(c.getCurrentTick() < camera.get_last_detected_time())   {
+            //
+            camera.setStatus(STATUS.DOWN);
+                terminate();
+        }
+        else{
+            if(camera.getStatus()== STATUS.UP){
+                //if the DetectedObjectsList is empty
+                if(camera.getDetectedObjectsList().isEmpty()==true){ //efshar lehorid im nagdir bapirsor im empty = -1
+                    camera.setStatus(STATUS.DOWN);
+                    terminate();
+                    sendBroadcast(new TerminatedBroadcast(getName()));
                 }
-                if (fut == null) { //msd_nus.sendEvent can also return null
-                    System.err.println("No service is available to handle the DetectObjectsEvent.");
-                    return;
+                DetectObjectsEvent eve = camera.handleTick(c.getCurrentTick());
+                if (eve != null) {
+                    //if() send only if frequency delay passed
+                    for(DetectedObject det : eve.getObjects()){
+                        if (det.getId() == "ERROR"){
+                            camera.setStatus(STATUS.ERROR);
+                            sendBroadcast(new CrashedBroadcast(det.getId(), "this item is error"));
+                            break;
+                        }
+                    }
+                    //there is not object ERROR
+                    statsFolder.incrementDetectedObjects(eve.getObjects().size()); //according to the assignment forum, numDetectedObjects the total detecting and not unique objects
+                    Future<Boolean> fut = MessageBusImpl.getInstance().sendEvent(eve);
+                    if (fut.get() == false) {
+                        sendBroadcast(new CrashedBroadcast(getName(), "Failure occurred while processing DetectObjectsEvent."));
+                        //lo BATUAH im nachon hasend Crashrd
+                    }
+                    
                 }
             }
-        });
-        subscribeBroadcast(TickBroadcast.class, (Callback<TickBroadcast>) messageCallBack.get(TickBroadcast.class));
+        }
+    });
 
-        messageCallBack.putIfAbsent(TerminatedBroadcast.class, (TerminatedBroadcast c) -> {
-            terminate();
-        });
-
-        subscribeBroadcast(TerminatedBroadcast.class, (Callback<TerminatedBroadcast>) messageCallBack.get(TerminatedBroadcast.class));
-
-        messageCallBack.putIfAbsent(CrashedBroadcast.class, (CrashedBroadcast c) -> {
-            terminate(); //both of TerminatedBroadcast and CrashedBroadcast are leading to termination?
+        subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast c) -> {
+            if(c.getSender() == "TimeService"){
+                terminate(); //if the sender of the TerminatedBroadcast is TimeService, the duration is over
+                camera.setStatus(STATUS.DOWN);
+            }
         });
 
-        subscribeBroadcast(CrashedBroadcast.class, (Callback<CrashedBroadcast>) messageCallBack.get(CrashedBroadcast.class));
 
-    }
+        subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast c) -> {
+            camera.setStatus(STATUS.DOWN);
+            terminate(); //when recieving a CrashedBroadcast from another objects, each service stops immediately
+        });
+
+        }
 }

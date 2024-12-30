@@ -3,6 +3,8 @@ package bgu.spl.mics;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
+import bgu.spl.mics.application.objects.StatisticalFolder;
+
 /**
  * The MicroService is an abstract class that any micro-service in the system
  * must extend. The abstract MicroService class is responsible to get and
@@ -27,6 +29,7 @@ public abstract class MicroService implements Runnable {
     private final String name;
     protected ConcurrentHashMap<Class<? extends Message>, Callback<?>> messageCallBack = new ConcurrentHashMap<>();
     private MessageBusImpl msg_bus;
+    protected StatisticalFolder statsManager;
 
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
@@ -35,6 +38,8 @@ public abstract class MicroService implements Runnable {
     public MicroService(String name) {
         this.name = name;
         this.msg_bus = MessageBusImpl.getInstance();
+        this.statsManager = StatisticalFolder.getInstance();
+
     }
 
     /**
