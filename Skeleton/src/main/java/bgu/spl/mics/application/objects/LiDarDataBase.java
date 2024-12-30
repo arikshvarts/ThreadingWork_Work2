@@ -50,6 +50,9 @@ public class LiDarDataBase {
         return map_time_cloudP;
     }
 
+      public ArrayList<StampedCloudPoints> getCloudPoints() {
+        return cloudPoints;
+    }
     /**
      * Returns the singleton instance of LiDarDataBase.
      *
