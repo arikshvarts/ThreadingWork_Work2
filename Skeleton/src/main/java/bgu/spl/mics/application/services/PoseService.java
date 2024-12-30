@@ -44,7 +44,8 @@ public class PoseService extends MicroService {
 
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast) ->
         {
-            terminate();
+            if (TerminatedBroadcast.getSender().equals("FusionSlam")) {
+                terminate();}
         });
         }
 }

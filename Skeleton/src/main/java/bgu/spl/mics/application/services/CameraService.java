@@ -56,7 +56,7 @@ public class CameraService extends MicroService {
         }
         
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast c) -> {
-        if(c.getCurrentTick() < camera.get_last_detected_time() + camera.getFrequency())   {
+        if(c.getCurrentTick() > camera.get_last_detected_time() + camera.getFrequency())   {
             //stop after last time you detected something + the frequency
             camera.setStatus(STATUS.DOWN);
             ServiceCounter.getInstance().decrementThreads();
