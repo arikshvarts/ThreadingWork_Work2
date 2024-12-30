@@ -15,14 +15,14 @@ public class LiDarWorkerTracker {
 
     private final int id; // The ID of the LiDar
     private final int frequency; // The time interval at which the LiDar sends new events
-    private STATUS status; // The status of the LiDar
-    private ArrayList<TrackedObject> lastTrackedObjects; // The last objects the LiDar tracked
+    private STATUS status=STATUS.UP; // The status of the LiDar
+    private ArrayList<TrackedObject> lastTrackedObjects=null; // The last objects the LiDar tracked
 
     public LiDarWorkerTracker(int id, int frequency, STATUS status, ArrayList<TrackedObject> lastTrackedObjects) {
         this.id = id;
         this.frequency = frequency;
-        this.status = status;
-        this.lastTrackedObjects = lastTrackedObjects;
+        // this.status = status;
+        // this.lastTrackedObjects = lastTrackedObjects;
     }
 
 

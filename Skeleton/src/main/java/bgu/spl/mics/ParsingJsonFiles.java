@@ -7,6 +7,7 @@ import bgu.spl.mics.application.objects.Camera;
 import bgu.spl.mics.application.objects.LiDarWorkerTracker;
 import bgu.spl.mics.application.objects.Pose;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -15,25 +16,32 @@ import java.util.Map;
 
 public class ParsingJsonFiles {
     private Configuration configuration;
+    private String configDirectory;
 
     public ParsingJsonFiles(String configFilePath) throws IOException {
         Gson gson = new Gson();
         try (FileReader reader = new FileReader(configFilePath)) {
             this.configuration = gson.fromJson(reader, Configuration.class);
         }
+        this.configDirectory = new File(configFilePath).getParent();
+    // this.configDirectory += path.substring(0, path.length() - 1);
+
     }
 
-    public Map<String, List<List<Camera>>> parseCameraData() throws IOException {
+    public List<Camera> parseCameraData() throws IOException {
         Gson gson = new Gson();
-        try (FileReader reader = new FileReader(configuration.Cameras.camera_datas_path)) {
-            Type type = new TypeToken<Map<String, List<List<Camera>>>>() {}.getType();
+        String path = configuration.Cameras.camera_datas_path;
+        try (FileReader reader = new FileReader(configDirectory+path.substring(1))) {
+            Type type = new TypeToken<List<Camera>>() {}.getType();
             return gson.fromJson(reader, type);
         }
     }
 
     public List<LiDarWorkerTracker> parseLidarData() throws IOException {
         Gson gson = new Gson();
-        try (FileReader reader = new FileReader(configuration.Lidars.lidars_data_path)) {
+        String path = configuration.Lidars.lidars_data_path;
+
+        try (FileReader reader = new FileReader(configDirectory+path.substring(1))) {
             Type type = new TypeToken<List<LiDarWorkerTracker>>() {}.getType();
             return gson.fromJson(reader, type);
         }
@@ -41,7 +49,8 @@ public class ParsingJsonFiles {
 
     public List<Pose> parsePoseData() throws IOException {
         Gson gson = new Gson();
-        try (FileReader reader = new FileReader(configuration.poseJsonFile)) {
+        String path = configuration.poseJsonFile;
+        try (FileReader reader = new FileReader(configDirectory+path.substring(1))) {
             Type type = new TypeToken<List<Pose>>() {}.getType();
             return gson.fromJson(reader, type);
         }

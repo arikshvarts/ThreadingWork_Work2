@@ -7,6 +7,13 @@ import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.application.messages.TrackedObjectsEvent;
 import bgu.spl.mics.application.objects.FusionSlam;
 
+import bgu.spl.mics.application.objects.LandMark;
+import bgu.spl.mics.application.objects.Pose;
+import bgu.spl.mics.application.objects.ServiceCounter;
+import bgu.spl.mics.application.objects.TrackedObject;
+import bgu.spl.mics.application.objects.StatisticalFolder;
+
+
 /**
  * FusionSlamService integrates data from multiple sensors to build and update
  * the robot's global map.
@@ -53,8 +60,12 @@ public class FusionSlamService extends MicroService {
 
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast) ->
         {
+            if (ServiceCounter.getInstance().getNumThreads() == 3){
             terminate();
+            sendBroadcast(new TerminatedBroadcast("FusionSlam"));
+            }
         });
-        }
+    }
+        
 
 }

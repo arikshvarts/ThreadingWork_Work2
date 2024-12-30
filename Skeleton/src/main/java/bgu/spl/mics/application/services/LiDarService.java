@@ -12,6 +12,7 @@ import bgu.spl.mics.application.messages.TrackedObjectsEvent;
 import bgu.spl.mics.application.objects.LiDarDataBase;
 import bgu.spl.mics.application.objects.LiDarWorkerTracker;
 import bgu.spl.mics.application.objects.STATUS;
+import bgu.spl.mics.application.objects.ServiceCounter;
 import bgu.spl.mics.application.objects.StatisticalFolder;
 
 
@@ -54,6 +55,8 @@ public class LiDarService extends MicroService {
         // Subscribes to TickBroadcast, TerminatedBroadcast, CrashedBroadcast, DetectObjectsEvent.
         if(liDarTracker.getStatus() == STATUS.ERROR){
             sendBroadcast(new CrashedBroadcast(getName(), "Error in the sensor"));
+            ServiceCounter.getInstance().decrementThreads();
+
             terminate();
             //if when we get the service its STATUS is ERROR, send crashedBroadcast and terminate
         }
@@ -63,6 +66,8 @@ public class LiDarService extends MicroService {
                       if(c.getCurrentTick() > last_detected_time + liDarTracker.getFrequency())   {
             //stop after last time you detected something + the frequency
             liDarTracker.setStatus(STATUS.DOWN);
+            ServiceCounter.getInstance().decrementThreads();
+
                 terminate();
             }
             else{
@@ -75,6 +80,7 @@ public class LiDarService extends MicroService {
                                 last_frame = eve; // the last time the camera processed the envirmoent, it means, what the camera saw at currTime - frequency
                                 sendEvent(eve);
                                 events_to_send.remove(eve);
+                                
                             }
                         } 
                     }
@@ -85,6 +91,8 @@ public class LiDarService extends MicroService {
 
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast c) -> {
             if(c.getSender() == "TimeService"){
+                ServiceCounter.getInstance().decrementThreads();
+
                 terminate(); //if the sender of the TerminatedBroadcast is TimeService, the duration is over
                 liDarTracker.setStatus(STATUS.DOWN);
             }
@@ -93,6 +101,10 @@ public class LiDarService extends MicroService {
 
         subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast c) -> {
             ErrorInfo.getInstance().AddLidarsLastFrames(last_frame); //updating the last frame to the ErrorInfo
+
+            ServiceCounter.getInstance().decrementThreads();
+
+
             terminate(); //when recieving a CrashedBroadcast from another objects, each service stops immediately
         });
 
@@ -104,11 +116,14 @@ public class LiDarService extends MicroService {
                 //if in proccessing of the detected objects asked we face an obect with id=ERROR     
                 sendBroadcast(new CrashedBroadcast(getName(), "the Lidar detected obj with id=error"));
                 //CHANGE AFTER THE PIRSOR (bring logic from handle DetectedEvent to here)
+                ServiceCounter.getInstance().decrementThreads();
+
                 terminate();
+
             }
             else{
             events_to_send.add(new_eve); 
-            }            
+            } 
         });
     }
 }

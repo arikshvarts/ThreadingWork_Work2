@@ -2,7 +2,7 @@ package bgu.spl.mics;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-
+import bgu.spl.mics.application.objects.ServiceCounter;
 import bgu.spl.mics.application.objects.StatisticalFolder;
 
 /**
@@ -180,6 +180,7 @@ public abstract class MicroService implements Runnable {
     public final void run() {
         msg_bus.register(this);
         initialize();
+        ServiceCounter.getInstance().incrementThreads();
         while (!terminated) {
             try {
                 Message msg = msg_bus.awaitMessage(this);

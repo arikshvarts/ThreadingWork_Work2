@@ -35,7 +35,6 @@ public class TimeService extends MicroService {
      */
     @Override
     protected void initialize() {
-
         subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast) ->
         {
             terminate();
@@ -43,27 +42,31 @@ public class TimeService extends MicroService {
 
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast) ->
         {
-            terminate();
-        });
-    
-        while (currentTick < totalTicks) {
-            // Broadcast the current tick to all subscribed microservices
+            if (TerminatedBroadcast.getSender().equals("FusionSlam")) {
+                terminate();}
+        });        
+
+        subscribeBroadcast(TickBroadcast.class, (TickBroadcast) ->
+        {
             sendBroadcast(new TickBroadcast(currentTick));
             currentTick++;
             StatisticalFolder.getInstance().updateRuntime(1);
             try {
                 // Simulate the passage of time for this tick
-                Thread.sleep(tickDuration);
+                Thread.sleep(tickDuration*1000);
             } catch (InterruptedException e) {
                 // Handle interruption and terminate the service
                 Thread.currentThread().interrupt();
-                break;
+            }  
+            if (currentTick == totalTicks) {
+                // Signal termination after all ticks are completed
+                sendBroadcast(new TerminatedBroadcast("TimeService"));
+                terminate();
             }
+});
+sendBroadcast(new TickBroadcast(currentTick));
         }
-        // Signal termination after all ticks are completed
-        sendBroadcast(new TerminatedBroadcast("TimeService"));
-        terminate();
+    }
         
 
-    }
-}
+    
