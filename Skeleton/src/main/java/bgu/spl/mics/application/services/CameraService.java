@@ -10,6 +10,7 @@ import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.objects.Camera;
 import bgu.spl.mics.application.objects.DetectedObject;
 import bgu.spl.mics.application.objects.STATUS;
+import bgu.spl.mics.application.objects.ServiceCounter;
 import bgu.spl.mics.application.objects.StatisticalFolder;
 
 /**
@@ -48,6 +49,8 @@ public class CameraService extends MicroService {
     protected void initialize() {
         if(camera.getStatus() == STATUS.ERROR){
             sendBroadcast(new CrashedBroadcast(getName(), "Error in the sensor"));
+            ServiceCounter.getInstance().decrementThreads();
+
             terminate();
             //if when we get the service its STATUS is ERROR, send crashedBroadcast and terminate
         }
@@ -56,6 +59,8 @@ public class CameraService extends MicroService {
         if(c.getCurrentTick() < camera.get_last_detected_time() + camera.getFrequency())   {
             //stop after last time you detected something + the frequency
             camera.setStatus(STATUS.DOWN);
+            ServiceCounter.getInstance().decrementThreads();
+
                 terminate();
         }
         else{
@@ -63,6 +68,8 @@ public class CameraService extends MicroService {
                 //if the DetectedObjectsList is empty
                 if(camera.getDetectedObjectsList().isEmpty()==true){ //efshar lehorid im nagdir bapirsor im empty = -1
                     camera.setStatus(STATUS.DOWN);
+                    ServiceCounter.getInstance().decrementThreads();
+
                     terminate();
                     sendBroadcast(new TerminatedBroadcast(getName()));
                 }
@@ -75,6 +82,8 @@ public class CameraService extends MicroService {
                         if (det.getId() == "ERROR"){
                             camera.setStatus(STATUS.ERROR);
                             sendBroadcast(new CrashedBroadcast(det.getId(), "this item is error"));
+                            ServiceCounter.getInstance().decrementThreads();
+
                             terminate();
                             break;
                         }
@@ -93,6 +102,7 @@ public class CameraService extends MicroService {
 
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast c) -> {
             if(c.getSender() == "TimeService"){
+                ServiceCounter.getInstance().decrementThreads();
                 terminate(); //if the sender of the TerminatedBroadcast is TimeService, the duration is over
                 camera.setStatus(STATUS.DOWN);
             }
@@ -101,6 +111,8 @@ public class CameraService extends MicroService {
 
         subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast c) -> {
             camera.setStatus(STATUS.DOWN);
+            ServiceCounter.getInstance().decrementThreads();
+
             terminate(); //when recieving a CrashedBroadcast from another objects, each service stops immediately
         });
 
