@@ -26,28 +26,43 @@ public class FusionSlam {
         return FusionSlamHolder.instance;
     }
 
-    public void processObjects(ArrayList<TrackedObject> trackedObjects) {
+    // public void processObjects(ArrayList<TrackedObject> trackedObjects) {
+
+    //     for (TrackedObject trackedObject : trackedObjects) {
+    //         LandMark lndMark = translateCoordinateSys(trackedObject);
+    //         updateLandmarks(lndMark);
+    //     }
+    // }   
+    public void processObjectsAtTime(ArrayList<TrackedObject> trackedObjects,int time) {
 
         for (TrackedObject trackedObject : trackedObjects) {
-            LandMark lndMark = translateCoordinateSys(trackedObject);
-            updateLandmarks(lndMark);
-        }
+            for (Pose pose : poses){
+                if (pose.getTime()==time){
+                    LandMark lndMark = translateCoordinateSys(trackedObject,pose);
+                    updateLandmarks(lndMark);
+                }
+            }
+    }
     }   
 
 
     public synchronized void updatePose(ArrayList<Pose> recPoses) {
-        this.poses=recPoses;
+        this.poses=recPoses;//check if synchronized is needed
+
+    }
+    public synchronized void addPose(Pose lastPose) {
+        this.poses.add(lastPose);//check if synchronized is needed
 
     }
 
 
 
-    public LandMark translateCoordinateSys(TrackedObject trackedObject) {
+    public LandMark translateCoordinateSys(TrackedObject trackedObject,Pose pose) {
         ArrayList<CloudPoint> globalCoordinates = new ArrayList<>();
         double yaw_rad=poses.getLast().getYaw()*Math.PI/180;
         for (CloudPoint localPoint : trackedObject.getCoordinates()) {
-            double x_global=localPoint.getX()*Math.cos(yaw_rad)-localPoint.getY()*Math.sin(yaw_rad)+poses.getLast().getX();
-            double y_global=localPoint.getX()*Math.sin(yaw_rad)+localPoint.getY()*Math.cos(yaw_rad)+poses.getLast().getY();
+            double x_global=localPoint.getX()*Math.cos(yaw_rad)-localPoint.getY()*Math.sin(yaw_rad)+pose.getX();
+            double y_global=localPoint.getX()*Math.sin(yaw_rad)+localPoint.getY()*Math.cos(yaw_rad)+pose.getY();
             globalCoordinates.add(new CloudPoint(x_global, y_global));
         }
         return new LandMark(trackedObject.getId(),trackedObject.getDescription(),globalCoordinates);
