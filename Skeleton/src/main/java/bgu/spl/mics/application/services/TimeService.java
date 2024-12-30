@@ -46,7 +46,7 @@ public class TimeService extends MicroService {
             }
         }
         // Signal termination after all ticks are completed
-        sendBroadcast(new TerminatedBroadcast());
+        sendBroadcast(new TerminatedBroadcast("TimeService"));
         terminate();
 
     }
