@@ -26,9 +26,9 @@ import bgu.spl.mics.application.objects.LiDarDataBase;
  */
 public class LiDarService extends MicroService {
 
-    LiDarWorkerTracker liDarTracker;    
+    private LiDarWorkerTracker liDarTracker;    
     //the events that are ready to send and wait for the frequency suspend to be sent
-    ArrayList<TrackedObjectsEvent> events_to_send = new ArrayList<>();
+      ArrayList<TrackedObjectsEvent> events_to_send = new ArrayList<>();
     //leshanoy im meshanin Pirsor MehaLidarDataBase
     int last_detected_time = LiDarDataBase.getInstance().getCloudPoints().get(LiDarDataBase.getInstance().getCloudPoints().size() - 1).getTime();
     private StatisticalFolder stat;
@@ -38,6 +38,7 @@ public class LiDarService extends MicroService {
         super("Lidar");
         this.liDarTracker = liDarTracker;
         this.stat = StatisticalFolder.getInstance();
+
     }
 
     /**
@@ -57,7 +58,7 @@ public class LiDarService extends MicroService {
 
 
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast c) -> {
-            if(c.getCurrentTick() < last_detected_time + liDarTracker.getFrequency())   {
+                      if(c.getCurrentTick() < last_detected_time + liDarTracker.getFrequency())   {
             //stop after last time you detected something + the frequency
             liDarTracker.setStatus(STATUS.DOWN);
                 terminate();

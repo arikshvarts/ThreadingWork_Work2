@@ -38,6 +38,7 @@ public class CameraService extends MicroService {
         //leshanot barega shehapirsor over mitoch hacemra lemakom aher
         this.last_detected_time = camera.getCameraData().get(camera.getCameraData().size() - 1).getTime();
         this.stat = StatisticalFolder.getInstance();
+
     }
 
     /**
@@ -67,8 +68,10 @@ public class CameraService extends MicroService {
                     sendBroadcast(new TerminatedBroadcast(getName()));
                 }
                 DetectObjectsEvent eve = camera.handleTick(c.getCurrentTick());
+                
                 if (eve != null) {
-                    //send only if frequency delay passed (handeled by handle tick)
+                  //send only if frequency delay passed (handeled by handle tick)
+
                     for(DetectedObject det : eve.getObjects()){
                         if (det.getId() == "ERROR"){
                             camera.setStatus(STATUS.ERROR);

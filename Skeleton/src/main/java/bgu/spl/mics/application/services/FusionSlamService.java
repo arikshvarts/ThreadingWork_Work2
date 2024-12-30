@@ -1,5 +1,8 @@
 package bgu.spl.mics.application.services;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.sound.midi.Track;
 
 import bgu.spl.mics.MessageBusImpl;
@@ -10,6 +13,10 @@ import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.messages.TrackedObjectsEvent;
 import bgu.spl.mics.application.objects.FusionSlam;
+import bgu.spl.mics.application.objects.LandMark;
+import bgu.spl.mics.application.objects.Pose;
+import bgu.spl.mics.application.objects.TrackedObject;
+import bgu.spl.mics.application.objects.StatisticalFolder;
 
 /**
  * FusionSlamService integrates data from multiple sensors to build and update
@@ -19,7 +26,7 @@ import bgu.spl.mics.application.objects.FusionSlam;
  * transforming and updating the map with new landmarks.
  */
 public class FusionSlamService extends MicroService {
-    FusionSlam fusionSlam;
+    private FusionSlam fusionSlam;
 
     /**
      * Constructor for FusionSlamService.
@@ -27,8 +34,9 @@ public class FusionSlamService extends MicroService {
      * @param fusionSlam The FusionSLAM object responsible for managing the global map.
      */
     public FusionSlamService(FusionSlam fusionSlam) {
-        super("Change_This_Name");
+        super("fusionSlam");
         fusionSlam = FusionSlam.getInstance();
+
     }
 
     /**
@@ -56,4 +64,5 @@ public class FusionSlamService extends MicroService {
             terminate();
         });
         }
+
 }
