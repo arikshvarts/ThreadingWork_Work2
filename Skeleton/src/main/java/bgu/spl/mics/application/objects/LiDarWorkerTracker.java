@@ -1,5 +1,10 @@
 package bgu.spl.mics.application.objects;
 
+import java.util.ArrayList;
+
+import bgu.spl.mics.application.messages.DetectObjectsEvent;
+import bgu.spl.mics.application.messages.TrackedObjectsEvent;
+
 /**
  * LiDarWorkerTracker is responsible for managing a LiDAR worker.
  * It processes DetectObjectsEvents and generates TrackedObjectsEvents by using data from the LiDarDataBase.
@@ -7,7 +12,6 @@ package bgu.spl.mics.application.objects;
  */
 public class LiDarWorkerTracker {
 
-<<<<<<< HEAD
     private final int id; // The ID of the LiDar
     private final int frequency; // The time interval at which the LiDar sends new events
     private STATUS status; // The status of the LiDar
@@ -61,7 +65,4 @@ public class LiDarWorkerTracker {
         return(new TrackedObjectsEvent(trackedObjects));
     }
     
-=======
-    // TODO: Define fields and methods.
->>>>>>> parent of 015e846 (my work on cameras lidar and statistical from shabat)
 }
