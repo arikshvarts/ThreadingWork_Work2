@@ -15,6 +15,7 @@ import bgu.spl.mics.application.messages.TrackedObjectsEvent;
 import bgu.spl.mics.application.objects.FusionSlam;
 import bgu.spl.mics.application.objects.LandMark;
 import bgu.spl.mics.application.objects.Pose;
+import bgu.spl.mics.application.objects.ServiceCounter;
 import bgu.spl.mics.application.objects.TrackedObject;
 import bgu.spl.mics.application.objects.StatisticalFolder;
 
@@ -61,8 +62,10 @@ public class FusionSlamService extends MicroService {
 
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast) ->
         {
+            if (ServiceCounter.getInstance().getNumThreads() == 3){
             terminate();
-        });
-        }
+        }});
+    }
+        
 
 }
