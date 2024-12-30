@@ -9,29 +9,18 @@ import java.util.List;
  * Implements the Singleton pattern to ensure a single instance of FusionSlam exists.
  */
 
-// public class FusionSlamService extends MicroService {
-//     private FusionSlam fusionSlam;
-//     private StatisticalFolder stat;
 
-//     /**
-//      * Constructor for FusionSlamService.
-//      *
-//      * @param fusionSlam The FusionSLAM object responsible for managing the global map.
-//      */
-//     public FusionSlamService(FusionSlam fusionSlam) {
-//         super("fusionSlam");
-//         fusionSlam = FusionSlam.getInstance();
-//         stat=StatisticalFolder.getInstance();
-
-//     }
 
 
 
 public class FusionSlam {
     // private final ConcurrentHashMap<String, LandMark>
     private ArrayList<LandMark> landmarks; // Global map of landmarks
-    private  ArrayList<Pose> poses; // list of Poses of the robot
+    private ArrayList<Pose> poses; // list of Poses of the robot
     private StatisticalFolder stats;
+    private ArrayList<TrackedObject> waitingObjs;
+    private boolean flag=false;
+
 
 
     // Singleton instance holder
@@ -61,8 +50,13 @@ public class FusionSlam {
                 if (pose.getTime()==trackedObject.getTime()){
                     LandMark lndMark = translateCoordinateSys(trackedObject,pose);
                     updateLandmarks(lndMark);
+                    flag=true;
                 }
             }
+            if (flag==false){
+                waitingObjs.add(trackedObject);
+            }
+
     }
     }   
 
