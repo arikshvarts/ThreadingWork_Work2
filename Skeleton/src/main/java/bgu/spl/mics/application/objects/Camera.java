@@ -15,23 +15,23 @@ public class Camera {
 
     private int id;
     private int frequency;
-    private STATUS status;
-    private final ArrayList<StampedDetectedObjects> detectedObjectsList;
-    private final String dataFilePath; //the path to this camera data we have as a string in the Configuration JSON File
-    private final ArrayList<StampedDetectedObjects> CameraData;
-    private final int last_detected_time;
+    private STATUS status=STATUS.UP;
+    private  ArrayList<StampedDetectedObjects> detectedObjectsList=new ArrayList<>();
+    private  String dataFilePath; //the path to this camera data we have as a string in the Configuration JSON File
+    private  ArrayList<StampedDetectedObjects> CameraData;
+    private  int last_detected_time;
+    String cameraKey;
 
 
 
-    public Camera(int id, int frequency, STATUS status, String dataFilePath) {
+    public Camera(int id, int frequency,String cameraKey) {
         this.id = id;
         this.frequency = frequency;
-        this.status = status;
-        this.detectedObjectsList = new ArrayList<>();
-        this.dataFilePath = dataFilePath;
-        this.CameraData = parseCameraData();
+        this.cameraKey= cameraKey;
+        // this.detectedObjectsList = new ArrayList<>();
+        // this.CameraData = parseCameraData();
         //leshanot barega shehapirsor over mitoch hacemra lemakom aher. laadcen how last detected time  gets its value
-        this.last_detected_time = getCameraData().get(getCameraData().size() - 1).getTime();
+        // this.last_detected_time = getCameraData().get(getCameraData().size() - 1).getTime();
 
 
     }

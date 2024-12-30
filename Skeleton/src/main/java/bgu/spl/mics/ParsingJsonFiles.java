@@ -28,11 +28,11 @@ public class ParsingJsonFiles {
 
     }
 
-    public Map<String, List<List<Camera>>> parseCameraData() throws IOException {
+    public List<Camera> parseCameraData() throws IOException {
         Gson gson = new Gson();
         String path = configuration.Cameras.camera_datas_path;
         try (FileReader reader = new FileReader(configDirectory+path.substring(1))) {
-            Type type = new TypeToken<Map<String, List<List<Camera>>>>() {}.getType();
+            Type type = new TypeToken<List<Camera>>() {}.getType();
             return gson.fromJson(reader, type);
         }
     }

@@ -35,6 +35,16 @@ public class TimeService extends MicroService {
      */
     @Override
     protected void initialize() {
+        subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast) ->
+        {
+            terminate();
+        });
+
+        subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast) ->
+        {
+            terminate();
+        });
+
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast) ->
         {
             sendBroadcast(new TickBroadcast(currentTick));

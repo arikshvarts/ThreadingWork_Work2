@@ -72,6 +72,7 @@ public class LiDarService extends MicroService {
                                 stat.incrementTrackedObjects(eve.getTrackedObjects().size());
                                 sendEvent(eve);
                                 events_to_send.remove(eve);
+                                
                             }
                         } 
                     }
@@ -104,7 +105,7 @@ public class LiDarService extends MicroService {
             }
             else{
             events_to_send.add(new_eve); 
-            }            
+            } 
         });
     }
 }
