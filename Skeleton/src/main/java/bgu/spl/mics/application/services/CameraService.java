@@ -23,6 +23,7 @@ public class CameraService extends MicroService {
 
     private final Camera camera;
     private final int last_detected_time;
+    private StatisticalFolder stat;
     // private int last_tick_detected;
 
     /**
@@ -35,6 +36,7 @@ public class CameraService extends MicroService {
         super("Camera");
         this.camera = camera;
         this.last_detected_time = camera.getCameraData().get(camera.getCameraData().size() - 1).getTime();
+        StatisticalFolder stat = StatisticalFolder.getInstance();
     }
 
     /**
@@ -62,7 +64,9 @@ public class CameraService extends MicroService {
                     sendBroadcast(new TerminatedBroadcast(getName()));
                 }
                 DetectObjectsEvent eve = camera.handleTick(c.getCurrentTick());
+                
                 if (eve != null) {
+                    stat.incrementDetectedObjects(eve.getObjects().size());
                     //if() send only if frequency delay passed
                     for(DetectedObject det : eve.getObjects()){
                         if (det.getId() == "ERROR"){

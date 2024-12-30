@@ -22,9 +22,11 @@ import bgu.spl.mics.application.objects.StatisticalFolder;
  */
 public class LiDarService extends MicroService {
 
-    LiDarWorkerTracker liDarTracker;    
+    private LiDarWorkerTracker liDarTracker;    
     //the events that are ready to send and wait for the frequency suspend to be sent
-    ArrayList<TrackedObjectsEvent> events_to_send = new ArrayList<>();
+    private ArrayList<TrackedObjectsEvent> events_to_send = new ArrayList<>();
+    private StatisticalFolder stat;
+
     /**
      * Constructor for LiDarService.
      *
@@ -33,6 +35,8 @@ public class LiDarService extends MicroService {
     public LiDarService(LiDarWorkerTracker liDarTracker) {
         super("Lidar");
         this.liDarTracker = liDarTracker;
+        stat=StatisticalFolder.getInstance();
+
     }
 
     /**
@@ -46,7 +50,10 @@ public class LiDarService extends MicroService {
         // Subscribes to TickBroadcast, TerminatedBroadcast, CrashedBroadcast, DetectObjectsEvent.
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast c) -> {
             if(events_to_send != null){
+
                 for(TrackedObjectsEvent eve : events_to_send) { //looping all proccessed events and check if ready to send
+                    stat.incrementTrackedObjects(eve.getTrackedObjects().size());
+
                     if(c.getCurrentTick() >= eve.getTime() + liDarTracker.getFrequency()){
                         //currTick > eve.time + freq  if the camera frequency greater than lidar frequency
                         sendEvent(eve);
