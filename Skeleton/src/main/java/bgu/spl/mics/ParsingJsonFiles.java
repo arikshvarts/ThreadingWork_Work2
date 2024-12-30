@@ -1,9 +1,10 @@
 package bgu.spl.mics;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import bgu.spl.mics.Configuration.Lidars;
-import bgu.spl.mics.application.objects.Camera;
+import bgu.spl.mics.Configuration;
+import bgu.spl.mics.application.objects.CameraData;
 import bgu.spl.mics.application.objects.LiDarWorkerTracker;
 import bgu.spl.mics.application.objects.Pose;
 
@@ -28,11 +29,11 @@ public class ParsingJsonFiles {
 
     }
 
-    public List<Camera> parseCameraData() throws IOException {
+    public List<CameraData> parseCameraData() throws IOException {
         Gson gson = new Gson();
         String path = configuration.Cameras.camera_datas_path;
         try (FileReader reader = new FileReader(configDirectory+path.substring(1))) {
-            Type type = new TypeToken<List<Camera>>() {}.getType();
+            Type type = new TypeToken<Map<String, List<CameraData>>>() {}.getType();
             return gson.fromJson(reader, type);
         }
     }

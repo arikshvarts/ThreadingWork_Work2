@@ -18,8 +18,8 @@ public class Camera {
     private STATUS status=STATUS.UP;
     private  ArrayList<StampedDetectedObjects> detectedObjectsList=new ArrayList<>();
     private  String dataFilePath; //the path to this camera data we have as a string in the Configuration JSON File
-    private  ArrayList<StampedDetectedObjects> CameraData;
-    private  int last_detected_time;
+    private  ArrayList<StampedDetectedObjects> CameraData=null;//change to relevent from pirsoor
+    private  int last_detected_time=-99999;//change to relevent from pirsoor
     String cameraKey;
 
 
