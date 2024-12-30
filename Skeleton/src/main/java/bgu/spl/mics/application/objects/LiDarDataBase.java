@@ -23,13 +23,12 @@ public class LiDarDataBase {
     private LiDarDataBase() {
         cloudPoints = new ArrayList<>();
     }
-    public static synchronized void initialize(String filePath) {
-        if (instance == null) {
-            instance = new LiDarDataBase();
-            instance.loadData(filePath); // Parse JSON here
-        } else {
-            throw new IllegalStateException("LiDarDataBase has already been initialized.");
-        }
+    private static class LidarDataBaseHelper {
+        private static final LiDarDataBase INSTANCE = new LiDarDataBase();
+    }
+
+    public static LiDarDataBase getInstance() {
+        return LidarDataBaseHelper.INSTANCE;
     }
     private synchronized void  loadData(String filePath) {
         Gson gson = new Gson();
@@ -59,10 +58,4 @@ public class LiDarDataBase {
      * @param filePath The path to the LiDAR data file.
      * @return The singleton instance of LiDarDataBase.
      */
-    public static LiDarDataBase getInstance() { //synchrinzation is not necessary because the initalization is seperate.
-        if (instance == null) {
-            throw new IllegalStateException("LiDarDataBase is not initialized. Call initialize() first.");
-        }
-        return instance;
-    }
 }
