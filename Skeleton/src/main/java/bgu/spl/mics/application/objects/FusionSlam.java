@@ -3,8 +3,6 @@ package bgu.spl.mics.application.objects;
 import java.util.ArrayList;
 import java.util.List;
 
-import bgu.spl.mics.MicroService;
-
 /**
  * Manages the fusion of sensor data for simultaneous localization and mapping (SLAM).
  * Combines data from multiple sensors (e.g., LiDAR, camera) to build and update a global map.
@@ -60,7 +58,7 @@ public class FusionSlam {
     public void processObjectsAtTime(ArrayList<TrackedObject> trackedObjects,int time) {
         for (TrackedObject trackedObject : trackedObjects) {
             for (Pose pose : poses){
-                if (pose.getTime()==time){
+                if (pose.getTime()==trackedObject.getTime()){
                     LandMark lndMark = translateCoordinateSys(trackedObject,pose);
                     updateLandmarks(lndMark);
                 }
@@ -95,12 +93,24 @@ public class FusionSlam {
 
     private ArrayList<CloudPoint> averageCoordinates(List<CloudPoint> existing, List<CloudPoint> incoming) {
         ArrayList<CloudPoint> result = new ArrayList<>();
-        int size = Math.min(existing.size(), incoming.size());
+        int sizeSmaller = Math.min(existing.size(), incoming.size());
+        int sizeBigger = Math.max(existing.size(), incoming.size());
+        List<CloudPoint> BigggerList = existing.size() > incoming.size() ? existing : incoming;
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < sizeSmaller; i++) {
             double avgX = (existing.get(i).getX() + incoming.get(i).getX()) / 2;
             double avgY = (existing.get(i).getY() + incoming.get(i).getY()) / 2;
             result.add(new CloudPoint(avgX, avgY));
+            if (i == sizeSmaller - 1) {
+                stats.incrementLandmarks(1);
+            }
+        }
+        for (int i = sizeSmaller; i < sizeBigger; i++) {
+
+            result.add(new CloudPoint(BigggerList.get(i).getX(), BigggerList.get(i).getY()));
+            if (i == sizeBigger - 1) {
+                stats.incrementLandmarks(1);
+            }
         }
 
         return result;
