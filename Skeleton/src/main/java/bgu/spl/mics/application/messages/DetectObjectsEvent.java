@@ -13,8 +13,8 @@ import bgu.spl.mics.application.objects.DetectedObject;
 
 public class DetectObjectsEvent implements Event<Boolean> {
 
-    private final int time;                       // Time the objects were detected
-    private final ArrayList<DetectedObject> objects;  // List of detected objects
+    private int time;                       // Time the objects were detected
+    private ArrayList<DetectedObject> objects;  // List of detected objects
 
     public DetectObjectsEvent(int time, ArrayList<DetectedObject> objects) {
         this.time = time;
