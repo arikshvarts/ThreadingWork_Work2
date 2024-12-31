@@ -1,13 +1,15 @@
 package bgu.spl.mics.application.services;
 
+import java.util.ArrayList;
+
 import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.ErrorInfo;
 import bgu.spl.mics.application.messages.CrashedBroadcast;
+import bgu.spl.mics.application.messages.PoseEvent;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
-import bgu.spl.mics.application.messages.PoseEvent;
 import bgu.spl.mics.application.objects.GPSIMU;
 import bgu.spl.mics.application.objects.Pose;
-import bgu.spl.mics.application.messages.PoseEvent;
 
 /**
  * PoseService is responsible for maintaining the robot's current pose (position and orientation)
@@ -15,6 +17,7 @@ import bgu.spl.mics.application.messages.PoseEvent;
  */
 public class PoseService extends MicroService {
     GPSIMU gpsimu=null;
+    ArrayList<Pose> kol_haposot; //the Array of all the poses for use in the ErrorInfo
     /**
      * Constructor for PoseService.
      *
@@ -22,7 +25,9 @@ public class PoseService extends MicroService {
      */
     public PoseService(GPSIMU gpsimu) {
         super("PoseService");
-        this.gpsimu=gpsimu;    }
+        this.gpsimu=gpsimu;
+        this.kol_haposot = new ArrayList<>();    
+    }
 
     /**
      * Initializes the PoseService.
@@ -36,10 +41,12 @@ public class PoseService extends MicroService {
             gpsimu.setCurrentTick(gpsimu.getCurrentTick()+1);
             if (pose != null) {
                 sendEvent(new PoseEvent(pose));
+                kol_haposot.add(pose);
             }
         });
         subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast) ->
         {
+            ErrorInfo.getInstance().setPoses(kol_haposot);
             terminate();
         });
 

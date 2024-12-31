@@ -1,4 +1,6 @@
 package bgu.spl.mics.application.objects;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 /**
  * Represents the robot's pose (position and orientation) in the environment.
@@ -31,5 +33,16 @@ public class Pose {
 
     public int getTime() {
         return time;
+    }
+
+    @Override
+    public String toString() {
+    JsonObject poseJson = new JsonObject();
+    poseJson.addProperty("time", time);
+    poseJson.addProperty("x", x);
+    poseJson.addProperty("y", y);
+    poseJson.addProperty("yaw", yaw);
+    
+    return new Gson().toJson(poseJson);
     }
 }

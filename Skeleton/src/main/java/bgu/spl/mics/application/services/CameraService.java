@@ -3,6 +3,7 @@ package bgu.spl.mics.application.services;
 import bgu.spl.mics.Future;
 import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.ErrorInfo;
 import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.DetectObjectsEvent;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
@@ -25,6 +26,7 @@ public class CameraService extends MicroService {
     private final Camera camera;
     private final int last_detected_time;
     private StatisticalFolder stat;
+    private DetectObjectsEvent last_frame; //in the ERROR output file we will use it for extracting the time and the objects
     // private int last_tick_detected;
 
     /**
@@ -39,6 +41,8 @@ public class CameraService extends MicroService {
         //leshanot barega shehapirsor over mitoch hacemra lemakom aher
         this.last_detected_time = camera.get_last_detected_time();
         this.stat = StatisticalFolder.getInstance();
+        this.last_frame = null; //NEED to check if initialize to null can cause an error in case of ErrorInfo trying to tostring this
+
     }
 
     /**
@@ -74,7 +78,7 @@ public class CameraService extends MicroService {
                     sendBroadcast(new TerminatedBroadcast(getName()));
                 }
                 DetectObjectsEvent eve = camera.handleTick(c.getCurrentTick());
-                
+                last_frame = eve; // the last time the camera processed the envirmoent, it means, what the camera saw at currTime - frequency 
                 if (eve != null) {
                   //send only if frequency delay passed (handeled by handle tick)
 
@@ -110,6 +114,7 @@ public class CameraService extends MicroService {
 
 
         subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast c) -> {
+            ErrorInfo.getInstance().AddCamerasLastFrames(last_frame); //updating the last frame to the ErrorInfo
             camera.setStatus(STATUS.DOWN);
             ServiceCounter.getInstance().decrementThreads();
 

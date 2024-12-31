@@ -1,23 +1,18 @@
 package bgu.spl.mics.application.services;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.sound.midi.Track;
-
-import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.PoseEvent;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
-import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.messages.TrackedObjectsEvent;
 import bgu.spl.mics.application.objects.FusionSlam;
+
 import bgu.spl.mics.application.objects.LandMark;
 import bgu.spl.mics.application.objects.Pose;
 import bgu.spl.mics.application.objects.ServiceCounter;
 import bgu.spl.mics.application.objects.TrackedObject;
 import bgu.spl.mics.application.objects.StatisticalFolder;
+
 
 /**
  * FusionSlamService integrates data from multiple sensors to build and update
@@ -55,8 +50,11 @@ public class FusionSlamService extends MicroService {
             fusionSlam.addPose(PoseEvent.getPose());
         });
 
-        subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast) ->
+        subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast c) ->
         {
+            String eror_description = c.getErrorMessage();
+            String faulty_sensor = c.getFaultyServiceName();
+            //we need to use this to infos when closing the program and write them to the ERROR_Output json file
             terminate();
         });
 
