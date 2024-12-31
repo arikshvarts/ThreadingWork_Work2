@@ -3,7 +3,7 @@ import java.util.List;
 
 public class Configuration {
     public Cameras Cameras;
-    public Lidars Lidars;
+    public LiDarWorkers LiDarWorkers;
     public String poseJsonFile;
     public int TickTime;
     public int Duration;
@@ -19,7 +19,7 @@ public class Configuration {
         public String camera_key;
     }
 
-    public static class Lidars {
+    public static class LiDarWorkers {
         public List<LidarConfiguration> LidarConfigurations;
         public String lidars_data_path;
     }

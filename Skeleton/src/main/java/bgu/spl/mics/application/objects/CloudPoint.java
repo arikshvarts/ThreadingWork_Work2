@@ -7,8 +7,9 @@ package bgu.spl.mics.application.objects;
 class CloudPoint {
     private double x;
     private double y;
+    private double z;
 
-    public CloudPoint(double x, double y) {
+    public CloudPoint(double x, double y, double z) {
         this.x = x;
         this.y = y;
     }

@@ -15,13 +15,21 @@ import com.google.gson.reflect.TypeToken;
  */
 public class LiDarDataBase {
     private static LiDarDataBase instance;
-    private final ArrayList<StampedCloudPoints> cloudPoints;
+    private  ArrayList<StampedCloudPoints> cloudPoints;
     //each key in this map is time and value is list of all StampedCloudPoints with the key time
     private static ConcurrentHashMap<Integer, ArrayList<StampedCloudPoints>> map_time_cloudP = new ConcurrentHashMap<>();
     
+
+    public void initialize(ArrayList<StampedCloudPoints> data) {
+        cloudPoints = data;
+                for (StampedCloudPoints point : cloudPoints) {
+            //updating all the values to our map
+            map_time_cloudP.computeIfAbsent(point.getTime(), k -> new ArrayList<>()).add(point);
+        }    }
     
-    private LiDarDataBase() {
-        cloudPoints = new ArrayList<>();
+        public LiDarDataBase() {
+cloudPoints=null;
+
     }
     private static class LidarDataBaseHelper {
         private static final LiDarDataBase INSTANCE = new LiDarDataBase();
@@ -30,20 +38,20 @@ public class LiDarDataBase {
     public static LiDarDataBase getInstance() {
         return LidarDataBaseHelper.INSTANCE;
     }
-    private synchronized void  loadData(String filePath) {
-        Gson gson = new Gson();
-        try (FileReader reader = new FileReader(filePath)) {
-            Type listType = new TypeToken<ArrayList<StampedCloudPoints>>() {}.getType();
-            ArrayList<StampedCloudPoints> parsedData = gson.fromJson(reader, listType);
-            cloudPoints.addAll(parsedData);
-        } catch (IOException e) {
-            System.err.println("Failed to load LiDAR data: " + e.getMessage());
-        }
-        for (StampedCloudPoints point : cloudPoints) {
-            //updating all the values to our map
-            map_time_cloudP.computeIfAbsent(point.getTime(), k -> new ArrayList<>()).add(point);
-        }
-    }
+    // private synchronized void  loadData(String filePath) {
+    //     Gson gson = new Gson();
+    //     try (FileReader reader = new FileReader(filePath)) {
+    //         Type listType = new TypeToken<ArrayList<StampedCloudPoints>>() {}.getType();
+    //         ArrayList<StampedCloudPoints> parsedData = gson.fromJson(reader, listType);
+    //         cloudPoints.addAll(parsedData);
+    //     } catch (IOException e) {
+    //         System.err.println("Failed to load LiDAR data: " + e.getMessage());
+    //     }
+    //     for (StampedCloudPoints point : cloudPoints) {
+    //         //updating all the values to our map
+    //         map_time_cloudP.computeIfAbsent(point.getTime(), k -> new ArrayList<>()).add(point);
+    //     }
+    // }
 
     public static ConcurrentHashMap<Integer, ArrayList<StampedCloudPoints>> getMapTimeHashMap() {
         return map_time_cloudP;

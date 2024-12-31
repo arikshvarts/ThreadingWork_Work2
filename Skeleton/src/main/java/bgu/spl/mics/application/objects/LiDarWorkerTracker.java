@@ -18,7 +18,7 @@ public class LiDarWorkerTracker {
     private STATUS status=STATUS.UP; // The status of the LiDar
     private ArrayList<TrackedObject> lastTrackedObjects=null; // The last objects the LiDar tracked
 
-    public LiDarWorkerTracker(int id, int frequency, STATUS status, ArrayList<TrackedObject> lastTrackedObjects) {
+    public LiDarWorkerTracker(int id, int frequency) {
         this.id = id;
         this.frequency = frequency;
         // this.status = status;

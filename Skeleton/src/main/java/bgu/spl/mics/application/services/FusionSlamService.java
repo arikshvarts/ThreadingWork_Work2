@@ -67,6 +67,13 @@ public class FusionSlamService extends MicroService {
             sendBroadcast(new TerminatedBroadcast("FusionSlam"));
             }
         });
+        subscribeBroadcast(TickBroadcast.class, (TerminatedBroadcast) ->
+        {
+            if (ServiceCounter.getInstance().getNumThreads() == 3){
+            terminate();
+            sendBroadcast(new TerminatedBroadcast("FusionSlam"));
+            }
+        });
     }
         
 

@@ -1,13 +1,7 @@
 package bgu.spl.mics.application.objects;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.List;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import bgu.spl.mics.application.messages.DetectObjectsEvent;
 
@@ -16,24 +10,27 @@ public class Camera {
     private int id;
     private int frequency;
     private STATUS status=STATUS.UP;
-    private  ArrayList<StampedDetectedObjects> detectedObjectsList=new ArrayList<>();
-    private  String dataFilePath; //the path to this camera data we have as a string in the Configuration JSON File
-    private  ArrayList<StampedDetectedObjects> CameraData=null;//change to relevent from pirsoor
-    private  int last_detected_time=-99999;//change to relevent from pirsoor
-    String cameraKey;
+    private  ArrayList<StampedDetectedObjects> CameraData;
+    private  int last_detected_time;
+    private String cameraKey;
+    // private ParsingJsonFiles parsed;
+
+    // {
+    //     try {
+    //         parsed = new ParsingJsonFiles("C:\\Users\\ariks\\uni\\CodingEnviroments\\Work2_Threading\\Skeleton\\example_input_2\\configuration_file.json");
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
+    //     }
+    // }
 
 
 
-    public Camera(int id, int frequency,String cameraKey) {
+    public Camera(int id, int frequency,String CameraKey,ArrayList<StampedDetectedObjects> camDat) {
         this.id = id;
         this.frequency = frequency;
-        this.cameraKey= cameraKey;
-        // this.detectedObjectsList = new ArrayList<>();
-        // this.CameraData = parseCameraData();
-        //leshanot barega shehapirsor over mitoch hacemra lemakom aher. laadcen how last detected time  gets its value
-        // this.last_detected_time = getCameraData().get(getCameraData().size() - 1).getTime();
-
-
+        this.cameraKey= CameraKey;
+        this.CameraData = camDat;
+        this.last_detected_time = CameraData.getLast().getTime();
     }
 
     public int getId() {
@@ -61,29 +58,29 @@ public class Camera {
     }
 
     public ArrayList<StampedDetectedObjects> getDetectedObjectsList() {
-        return detectedObjectsList;
+        return CameraData;
     }
 
     public void addDetectedObjects(int time, ArrayList<DetectedObject> detectedObjects) {
-        detectedObjectsList.add(new StampedDetectedObjects(time, detectedObjects));
+        CameraData.add(new StampedDetectedObjects(time, detectedObjects));
     }
 
     public int get_last_detected_time(){
         return last_detected_time;
     }
 
-    //parsing from camera_data.json
-    private ArrayList<StampedDetectedObjects> parseCameraData() {
-        try (FileReader reader = new FileReader(dataFilePath)) {
-            Gson gson = new Gson();
-            Type listType = new TypeToken<List<StampedDetectedObjects>>() {
-            }.getType();
-            return gson.fromJson(reader, listType);
-        } catch (IOException e) {
-            System.err.println("Error reading camera data file for Camera " + id + ": " + e.getMessage());
-            return new ArrayList<>(); // Return an empty list if an error occurs
-        }
-    }
+    // //parsing from camera_data.json
+    // private ArrayList<StampedDetectedObjects> parseCameraData() {
+    //     try (FileReader reader = new FileReader(dataFilePath)) {
+    //         Gson gson = new Gson();
+    //         Type listType = new TypeToken<List<StampedDetectedObjects>>() {
+    //         }.getType();
+    //         return gson.fromJson(reader, listType);
+    //     } catch (IOException e) {
+    //         System.err.println("Error reading camera data file for Camera " + id + ": " + e.getMessage());
+    //         return new ArrayList<>(); // Return an empty list if an error occurs
+    //     }
+    // }
 
     public DetectObjectsEvent handleTick(int currTime) {
         for (StampedDetectedObjects data : CameraData) {
@@ -97,13 +94,13 @@ public class Camera {
         return new DetectObjectsEvent(currTime, new ArrayList<>());
     }
 
-    public ArrayList<StampedDetectedObjects> getCameraData(){
-        return CameraData;
-    }
+    // public ArrayList<StampedDetectedObjects> getCameraData(){
+    //     return CameraData;
+    // }
 
     @Override
     public String toString() {
-        return "Camera{id=" + id + ", frequency=" + frequency + ", status=" + status + ", detectedObjectsList=" + detectedObjectsList + "}";
+        return "Camera{id=" + id + ", frequency=" + frequency + ", status=" + status + ", detectedObjectsList=" + this.getDetectedObjectsList() + "}";
     }
 
 }

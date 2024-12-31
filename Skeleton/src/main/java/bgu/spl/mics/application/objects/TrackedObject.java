@@ -11,11 +11,11 @@ import java.util.List;
 public class TrackedObject {
     private final String id;
     private final String description;
-    private final ArrayList<CloudPoint> coordinates;
+    private final ArrayList<ArrayList<Double>> coordinates;
     private final int time;
 
 
-    public TrackedObject(String id, String description, ArrayList<CloudPoint> coordinates,int time) {
+    public TrackedObject(String id, String description, ArrayList<ArrayList<Double>> coordinates,int time) {
         this.id = id;
         this.description = description;
         this.coordinates = coordinates;
@@ -30,7 +30,7 @@ public class TrackedObject {
         return description;
     }
 
-    public List<CloudPoint> getCoordinates() {
+    public ArrayList<ArrayList<Double>> getCoordinates() {
         return coordinates;
     }
     public int getTime() {
