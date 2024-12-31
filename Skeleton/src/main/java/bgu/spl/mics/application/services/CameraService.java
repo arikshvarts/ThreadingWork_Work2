@@ -39,7 +39,7 @@ public class CameraService extends MicroService {
         super("Camera");
         this.camera = camera;
         //leshanot barega shehapirsor over mitoch hacemra lemakom aher
-        this.last_detected_time = camera.getCameraData().get(camera.getCameraData().size() - 1).getTime();
+        this.last_detected_time = camera.get_last_detected_time();
         this.stat = StatisticalFolder.getInstance();
         this.last_frame = null; //NEED to check if initialize to null can cause an error in case of ErrorInfo trying to tostring this
 

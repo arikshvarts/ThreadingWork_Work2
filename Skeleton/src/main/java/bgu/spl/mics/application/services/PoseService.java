@@ -38,6 +38,7 @@ public class PoseService extends MicroService {
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast) ->
         {
             Pose pose = gpsimu.getTickAtTime();//chack if this is implementation
+            gpsimu.setCurrentTick(gpsimu.getCurrentTick()+1);
             if (pose != null) {
                 sendEvent(new PoseEvent(pose));
                 kol_haposot.add(pose);

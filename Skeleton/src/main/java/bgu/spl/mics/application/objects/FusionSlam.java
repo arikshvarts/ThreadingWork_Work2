@@ -75,10 +75,10 @@ public class FusionSlam {
     public LandMark translateCoordinateSys(TrackedObject trackedObject,Pose pose) {
         ArrayList<CloudPoint> globalCoordinates = new ArrayList<>();
         double yaw_rad=pose.getYaw()*Math.PI/180;
-        for (CloudPoint localPoint : trackedObject.getCoordinates()) {
-            double x_global=localPoint.getX()*Math.cos(yaw_rad)-localPoint.getY()*Math.sin(yaw_rad)+pose.getX();
-            double y_global=localPoint.getX()*Math.sin(yaw_rad)+localPoint.getY()*Math.cos(yaw_rad)+pose.getY();
-            globalCoordinates.add(new CloudPoint(x_global, y_global));
+        for (ArrayList<Double> localPoint : trackedObject.getCoordinates()) {
+            double x_global=localPoint.get(0)*Math.cos(yaw_rad)-localPoint.get( 1)*Math.sin(yaw_rad)+pose.getX();
+            double y_global=localPoint.get(0)*Math.sin(yaw_rad)+localPoint.get(1)*Math.cos(yaw_rad)+pose.getY();
+            globalCoordinates.add(new CloudPoint(x_global, y_global,0));
         }
         return new LandMark(trackedObject.getId(),trackedObject.getDescription(),globalCoordinates);
 
@@ -94,14 +94,14 @@ public class FusionSlam {
         for (int i = 0; i < sizeSmaller; i++) {
             double avgX = (existing.get(i).getX() + incoming.get(i).getX()) / 2;
             double avgY = (existing.get(i).getY() + incoming.get(i).getY()) / 2;
-            result.add(new CloudPoint(avgX, avgY));
+            result.add(new CloudPoint(avgX, avgY,0));
             if (i == sizeSmaller - 1) {
                 stats.incrementLandmarks(1);
             }
         }
         for (int i = sizeSmaller; i < sizeBigger; i++) {
 
-            result.add(new CloudPoint(BigggerList.get(i).getX(), BigggerList.get(i).getY()));
+            result.add(new CloudPoint(BigggerList.get(i).getX(), BigggerList.get(i).getY(),0));
             if (i == sizeBigger - 1) {
                 stats.incrementLandmarks(1);
             }

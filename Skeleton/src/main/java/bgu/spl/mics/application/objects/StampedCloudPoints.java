@@ -10,9 +10,9 @@ public class StampedCloudPoints {
 
         private final String id;
         private final int time;
-        private final ArrayList<CloudPoint>  cloudPoints;
+        private  ArrayList<ArrayList<Double>>  cloudPoints;
 
-        public StampedCloudPoints(String id,int time, ArrayList<CloudPoint> cloudPoints) {
+        public StampedCloudPoints(String id,int time, ArrayList<ArrayList<Double>> cloudPoints) {
         this.id = id;
         this.time = time;
         this.cloudPoints = cloudPoints;
@@ -26,8 +26,11 @@ public class StampedCloudPoints {
         return time;
     }
 
-    public ArrayList<CloudPoint>  getCloudPoints() {
+    public ArrayList<ArrayList<Double>> getCloudPoints() {
         return cloudPoints;
+    }
+    public void setCloudPoints(ArrayList<ArrayList<Double>>clPoints) {
+        this.cloudPoints=clPoints;
     }
     
 
