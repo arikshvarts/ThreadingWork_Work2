@@ -18,6 +18,7 @@ import bgu.spl.mics.application.objects.STATUS;
 import bgu.spl.mics.application.objects.StampedDetectedObjects;
 import bgu.spl.mics.application.objects.TrackedObject;
 import bgu.spl.mics.application.objects.StampedCloudPoints;
+import bgu.spl.mics.application.objects.CloudPoint;
 
 import java.io.File;
 import java.io.FileReader;
@@ -31,7 +32,9 @@ public class ParsingJsonFiles {
     public Configuration configuration;
     public String configDirectory;
     public Map<String, ArrayList<StampedDetectedObjects>> cameraData;
-    public ArrayList<StampedCloudPoints> lidarData;
+    public ArrayList<lidarData> lidarData3Pts;
+    public ArrayList<StampedCloudPoints> lidarData2Pts;
+
     public ArrayList<Pose> PoseData;
     List<Camera> Cameras ;
     List<LiDarWorkerTracker> Lidars ;
@@ -48,10 +51,12 @@ public class ParsingJsonFiles {
         Cameras = new ArrayList<>();
         Lidars = new ArrayList<>();
         cameraData = parseCameraData();
-        lidarData = parseLidarData();
+        lidarData3Pts = parseLidarData();
+        lidarData2Pts=two_to_three(lidarData3Pts);
         db=new LiDarDataBase();
-        db.initialize(lidarData);
+        db.initialize(lidarData2Pts);
         PoseData = parsePoseData();
+        gps = new GPSIMU();
         for (CameraConfiguration config : configuration.Cameras.CamerasConfigurations) {
             int id = config.id;
             int frequency = config.frequency;
@@ -80,12 +85,12 @@ public class ParsingJsonFiles {
         }
     }
 
-    public ArrayList<StampedCloudPoints> parseLidarData() throws IOException {
+    public ArrayList<lidarData> parseLidarData() throws IOException {
         Gson gson = new Gson();
         String path = configuration.LiDarWorkers.lidars_data_path;
 
         try (FileReader reader = new FileReader(configDirectory+path.substring(1))) {
-            Type type = new TypeToken<ArrayList<StampedCloudPoints>>() {}.getType();
+            Type type = new TypeToken<ArrayList<lidarData>>() {}.getType();
             return gson.fromJson(reader, type);
         }
     }
@@ -103,6 +108,24 @@ public class ParsingJsonFiles {
     public Configuration getConfiguration() {
         return configuration;
     }
+public ArrayList<StampedCloudPoints> two_to_three(ArrayList<lidarData> lidarData3Pts){
+    String id="";
+    int time=0;
+    ArrayList<StampedCloudPoints> lidarData2Pts = new ArrayList<>();
+    ArrayList<CloudPoint> cloudPoints = new ArrayList<>();
+    for(lidarData data : lidarData3Pts){
+        id=data.getId();
+        time=data.getTime();
+        for (ArrayList<Double> ls : data.get3pts()){
+            cloudPoints.add(new CloudPoint(ls.get(0),ls.get(1)));
+        }
+        lidarData2Pts.add(new StampedCloudPoints(data.getId(),data.getTime(),cloudPoints));
+
+    }
+    return lidarData2Pts;   
+}
+
+
     public static void main(String[] args) {
         try {
             ParsingJsonFiles parsingJsonFiles = new ParsingJsonFiles("C:\\Users\\ariks\\uni\\CodingEnviroments\\Work2_Threading\\Skeleton\\example input\\configuration_file.json");

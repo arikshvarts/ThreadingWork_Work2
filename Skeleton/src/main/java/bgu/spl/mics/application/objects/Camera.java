@@ -69,19 +69,6 @@ public class Camera {
         return last_detected_time;
     }
 
-    // //parsing from camera_data.json
-    // private ArrayList<StampedDetectedObjects> parseCameraData() {
-    //     try (FileReader reader = new FileReader(dataFilePath)) {
-    //         Gson gson = new Gson();
-    //         Type listType = new TypeToken<List<StampedDetectedObjects>>() {
-    //         }.getType();
-    //         return gson.fromJson(reader, listType);
-    //     } catch (IOException e) {
-    //         System.err.println("Error reading camera data file for Camera " + id + ": " + e.getMessage());
-    //         return new ArrayList<>(); // Return an empty list if an error occurs
-    //     }
-    // }
-
     public DetectObjectsEvent handleTick(int currTime) {
         for (StampedDetectedObjects data : CameraData) {
             //send only if frequency delay passed
@@ -94,9 +81,6 @@ public class Camera {
         return new DetectObjectsEvent(currTime, new ArrayList<>());
     }
 
-    // public ArrayList<StampedDetectedObjects> getCameraData(){
-    //     return CameraData;
-    // }
 
     @Override
     public String toString() {
