@@ -39,7 +39,7 @@ public class FusionSlam {
         private static final FusionSlam instance = new FusionSlam();
 
     }
-    private FusionSlam() {
+    public FusionSlam() {
         this.landmarks=new ArrayList<LandMark>();
         this.poses=new ArrayList<Pose>();
         this.stats = StatisticalFolder.getInstance();

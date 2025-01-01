@@ -36,10 +36,10 @@ public class ParsingJsonFiles {
     public ArrayList<StampedCloudPoints> lidarData2Pts;
 
     public ArrayList<Pose> PoseData;
-    List<Camera> Cameras ;
-    List<LiDarWorkerTracker> Lidars ;
-    LiDarDataBase db;
-    GPSIMU gps;
+    public ArrayList<Camera> Cameras ;
+    public ArrayList<LiDarWorkerTracker> Lidars ;
+    public LiDarDataBase db;
+    public GPSIMU gps;
 
     public ParsingJsonFiles(String configFilePath) throws IOException {
         Gson gson = new Gson();
@@ -48,32 +48,6 @@ public class ParsingJsonFiles {
         }
         this.configDirectory = new File(configFilePath).getParent();
         // Initialize cameras
-        Cameras = new ArrayList<>();
-        Lidars = new ArrayList<>();
-        cameraData = parseCameraData();
-        lidarData3Pts = parseLidarData();
-        lidarData2Pts=two_to_three(lidarData3Pts);
-        db=new LiDarDataBase();
-        db.initialize(lidarData2Pts);
-        PoseData = parsePoseData();
-        gps = new GPSIMU();
-        for (CameraConfiguration config : configuration.Cameras.CamerasConfigurations) {
-            int id = config.id;
-            int frequency = config.frequency;
-            String key = config.camera_key;
-
-            Cameras.add(new Camera(id, frequency,key,cameraData.get(key)));
-        }
-        for (LidarConfiguration config : configuration.LiDarWorkers.LidarConfigurations) {
-            int id = config.id;
-            int frequency = config.frequency;
-            Lidars.add(new LiDarWorkerTracker(id, frequency));
-        }
-        gps.setCurrentTick(0);
-        gps.setPoseList(PoseData);
-        System.out.println("Done parsing");
-
-
     }
 
     public Map<String, ArrayList<StampedDetectedObjects>> parseCameraData() throws IOException {
