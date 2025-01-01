@@ -128,7 +128,6 @@ public class FusionSlam {
         return toReturn;
     }
 
-        //when receiving a new pose (PoseEvent), checking if it is corresponding to some of the waiting objects:
         public void handleWaitObj(Pose pose) {
             Iterator<TrackedObject> iter = waitingObjs.iterator();
             while (iter.hasNext()) {
