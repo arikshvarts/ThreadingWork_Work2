@@ -77,7 +77,7 @@ public class LiDarService extends MicroService {
                             if(c.getCurrentTick() >= eve.getTime() + liDarTracker.getFrequency()){
                                 //currTick > eve.time + freq  if the camera frequency greater than lidar frequency
                                 stat.incrementTrackedObjects(eve.getTrackedObjects().size());
-                                last_frame = eve; // the last time the camera processed the envirmoent, it means, what the camera saw at currTime - frequency
+                                last_frame = eve; // last_frame is the last TrackedObjectsEvent we sent
                                 sendEvent(eve);
                                 events_to_send.remove(eve);
                                 

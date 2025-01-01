@@ -20,10 +20,10 @@ public class ServiceCounter {
         }
 
         public void incrementThreads() {
-            this.numThreads.decrementAndGet();        }
+            this.numThreads.incrementAndGet();        }
 
             public void decrementThreads() {
-                this.numThreads.incrementAndGet();        }
+                this.numThreads.decrementAndGet();        }
             public int  getNumThreads() {
 
                 return numThreads.get();

@@ -54,7 +54,6 @@ public class CameraService extends MicroService {
         if(camera.getStatus() == STATUS.ERROR){
             sendBroadcast(new CrashedBroadcast(getName(), "Error in the sensor"));
             ServiceCounter.getInstance().decrementThreads();
-
             terminate();
             //if when we get the service its STATUS is ERROR, send crashedBroadcast and terminate
         }
@@ -78,10 +77,10 @@ public class CameraService extends MicroService {
                     sendBroadcast(new TerminatedBroadcast(getName()));
                 }
                 DetectObjectsEvent eve = camera.handleTick(c.getCurrentTick());
-                last_frame = eve; // the last time the camera processed the envirmoent, it means, what the camera saw at currTime - frequency 
-                if (eve != null) {
-                  //send only if frequency delay passed (handeled by handle tick)
-
+                if(eve.getObjects().isEmpty() == false ) {
+                    //update last_frame and send DetectObjectsEvent only if the camera saw something
+                    last_frame = eve; // the last time the camera processed the envirmoent, it means, what the camera saw at currTime - frequency 
+                    //send only if frequency delay passed (handeled by handle tick)
                     for(DetectedObject det : eve.getObjects()){
                         if (det.getId() == "ERROR"){
                             camera.setStatus(STATUS.ERROR);
@@ -93,6 +92,7 @@ public class CameraService extends MicroService {
                         }
                     }
                     stat.incrementDetectedObjects(eve.getObjects().size());
+                }
                     Future<Boolean> fut = MessageBusImpl.getInstance().sendEvent(eve);
                     if (fut.get() == false) {
                         sendBroadcast(new CrashedBroadcast(getName(), "Failure occurred while processing DetectObjectsEvent."));
@@ -102,7 +102,7 @@ public class CameraService extends MicroService {
                 }
             }
         }
-    });
+    );
 
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast c) -> {
             if(c.getSender() == "TimeService"){
