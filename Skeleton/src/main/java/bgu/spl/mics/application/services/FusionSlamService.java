@@ -1,15 +1,17 @@
 package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.ErrorInfo;
 import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.PoseEvent;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.messages.TrackedObjectsEvent;
+import bgu.spl.mics.application.objects.CloudPoint;
 import bgu.spl.mics.application.objects.FusionSlam;
-
-
+import bgu.spl.mics.application.objects.LandMark;
 import bgu.spl.mics.application.objects.ServiceCounter;
+import bgu.spl.mics.application.objects.StatisticalFolder;
 import bgu.spl.mics.application.objects.TrackedObject;
 
 
@@ -32,7 +34,6 @@ public class FusionSlamService extends MicroService {
     public FusionSlamService(FusionSlam FusionSlam) {
         super("fusionSlam");
         this.fusionSlam = FusionSlam;
-
     }
 
     /**
@@ -58,9 +59,9 @@ public class FusionSlamService extends MicroService {
 
         subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast c) ->
         {
-            String eror_description = c.getErrorMessage();
-            String faulty_sensor = c.getFaultyServiceName();
             //we need to use this to infos when closing the program and write them to the ERROR_Output json file
+            ErrorInfo.getInstance().set_crashed_brod(c);
+            ErrorInfo.getInstance().createOutput(); //is this the right place to call createOutput()?
             terminate();
         });
 
@@ -68,13 +69,11 @@ public class FusionSlamService extends MicroService {
         {
             if (TerminatedBroadcast.getSender().equals("TimeService")) {
                 terminate();
+                fusionSlam.createOutput();
             }
-            // if (TerminatedBroadcast.getSender().equals("LiDarService")) {
-            //     terminate(); //we need to check if we need to terminate the service when the LiDarService is terminated
-            // }
-
-
-            if (ServiceCounter.getInstance().getNumThreads() ==  2){
+            else if (ServiceCounter.getInstance().getNumThreads() ==  2){
+                //it means all the microservices are terminated except Fusion and Time
+            fusionSlam.createOutput();
             terminate();
             sendBroadcast(new TerminatedBroadcast("FusionSlam"));
             }
@@ -84,5 +83,6 @@ public class FusionSlamService extends MicroService {
         });
     }
         
+
 
 }

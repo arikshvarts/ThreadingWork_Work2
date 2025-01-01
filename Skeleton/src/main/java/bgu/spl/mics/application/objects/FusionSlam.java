@@ -1,8 +1,17 @@
 package bgu.spl.mics.application.objects;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * Manages the fusion of sensor data for simultaneous localization and mapping (SLAM).
@@ -21,6 +30,7 @@ public class FusionSlam {
     private StatisticalFolder stats;
     private ArrayList<TrackedObject> waitingObjs;
     private boolean flag=false;
+    private StatisticalFolder stat;
 
 
 
@@ -34,6 +44,7 @@ public class FusionSlam {
         this.poses=new ArrayList<Pose>();
         this.stats = StatisticalFolder.getInstance();
         this.waitingObjs=new ArrayList<TrackedObject>();
+        this.stat = StatisticalFolder.getInstance();
     }
     public static FusionSlam getInstance() {
         return FusionSlamHolder.instance;
@@ -139,7 +150,52 @@ public class FusionSlam {
             }
 
         }
+
+    }
+    public ArrayList<LandMark> getLandMarks(){
+        return landmarks;
     }
 
+     //createoutput function, will be called if all services terminated without crash.
+    //still need to check how the file looks
+    public void createOutput() {
+    JsonObject outputJson = new JsonObject();
+
+    // Add statistics
+    JsonObject statistics = new JsonObject();
+    statistics.addProperty("systemRuntime", stat.getSystemRuntime().get());
+    statistics.addProperty("numDetectedObjects", stat.getNumDetectedObjects().get());
+    statistics.addProperty("numTrackedObjects", stat.getNumTrackedObjects().get());
+    statistics.addProperty("numLandmarks", stat.getNumLandmarks().get());
+    outputJson.add("statistics", statistics);
+
+    // Add landmarks
+    JsonArray landMarksArray = new JsonArray();
+    for (LandMark landmark : getLandMarks()) { // Assuming getLandMarks() returns a list of LandMark objects
+        JsonObject landMarkJson = new JsonObject();
+        landMarkJson.addProperty("id", landmark.getId());
+        landMarkJson.addProperty("description", landmark.getDescription());
+
+        JsonArray coordinatesArray = new JsonArray();
+        for (CloudPoint point : landmark.getCoordinates()) {
+            JsonObject coordinate = new JsonObject();
+            coordinate.addProperty("x", point.getX());
+            coordinate.addProperty("y", point.getY());
+            coordinatesArray.add(coordinate);
+        }
+        landMarkJson.add("coordinates", coordinatesArray);
+        landMarksArray.add(landMarkJson);
+    }
+    outputJson.add("landMarks", landMarksArray);
+
+    // Write JSON to file
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    try (FileWriter file = new FileWriter("output_file.json")) {
+        gson.toJson(outputJson, file);
+        file.flush();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
 }
     
