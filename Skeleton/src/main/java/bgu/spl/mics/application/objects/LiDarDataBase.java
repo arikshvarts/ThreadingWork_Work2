@@ -22,10 +22,11 @@ public class LiDarDataBase {
 
     public void initialize(ArrayList<StampedCloudPoints> data) {
         cloudPoints = data;
-                for (StampedCloudPoints point : cloudPoints) {
+        for (StampedCloudPoints point : cloudPoints) {
             //updating all the values to our map
             map_time_cloudP.computeIfAbsent(point.getTime(), k -> new ArrayList<>()).add(point);
-        }    }
+        }    
+    }
     
         public LiDarDataBase() {
 cloudPoints=null;
@@ -38,20 +39,7 @@ cloudPoints=null;
     public static LiDarDataBase getInstance() {
         return LidarDataBaseHelper.INSTANCE;
     }
-    // private synchronized void  loadData(String filePath) {
-    //     Gson gson = new Gson();
-    //     try (FileReader reader = new FileReader(filePath)) {
-    //         Type listType = new TypeToken<ArrayList<StampedCloudPoints>>() {}.getType();
-    //         ArrayList<StampedCloudPoints> parsedData = gson.fromJson(reader, listType);
-    //         cloudPoints.addAll(parsedData);
-    //     } catch (IOException e) {
-    //         System.err.println("Failed to load LiDAR data: " + e.getMessage());
-    //     }
-    //     for (StampedCloudPoints point : cloudPoints) {
-    //         //updating all the values to our map
-    //         map_time_cloudP.computeIfAbsent(point.getTime(), k -> new ArrayList<>()).add(point);
-    //     }
-    // }
+
 
     public static ConcurrentHashMap<Integer, ArrayList<StampedCloudPoints>> getMapTimeHashMap() {
         return map_time_cloudP;

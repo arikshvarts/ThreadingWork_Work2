@@ -47,12 +47,12 @@ public class FusionSlamService extends MicroService {
             for (TrackedObject trackedObject : TrackedObjectsEvent.getTrackedObjects()) {
                 fusionSlam.addOrUpdateLandMark(trackedObject);
             }
-            complete(TrackedObjectsEvent, true);
+            // complete(TrackedObjectsEvent, true);
         });
 
         subscribeEvent(PoseEvent.class,(PoseEvent) ->{
             fusionSlam.InsertPose(PoseEvent.getPose());
-            fusionSlam.handleWaitObj(PoseEvent.getPose()); //checks if the current pose corresponds to some of the waiting objects.
+            fusionSlam.handleWaitObj(PoseEvent.getPose());
             // complete(PoseEvent, true);
 
         });
