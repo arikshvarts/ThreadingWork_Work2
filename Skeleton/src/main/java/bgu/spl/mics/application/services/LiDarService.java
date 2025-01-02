@@ -1,6 +1,7 @@
 package bgu.spl.mics.application.services;
 
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.ErrorInfo;
@@ -36,8 +37,8 @@ public class LiDarService extends MicroService {
     TrackedObjectsEvent last_frame; //in the ERROR output file we will use it for extracting the time and the objects
 
     
-    public LiDarService(LiDarWorkerTracker liDarTracker) {
-        super("Lidar");
+    public LiDarService(LiDarWorkerTracker liDarTracker,CountDownLatch latch) {
+        super("Lidar",latch);
         this.liDarTracker = liDarTracker;
         this.stat = StatisticalFolder.getInstance();
         this.last_frame = new TrackedObjectsEvent(new ArrayList<TrackedObject>(), 0);

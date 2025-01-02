@@ -1,5 +1,7 @@
 package bgu.spl.mics.application.services;
 
+import java.util.concurrent.CountDownLatch;
+
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.ErrorInfo;
 import bgu.spl.mics.application.messages.CrashedBroadcast;
@@ -31,8 +33,8 @@ public class FusionSlamService extends MicroService {
      *
      * @param fusionSlam The FusionSLAM object responsible for managing the global map.
      */
-    public FusionSlamService(FusionSlam FusionSlam) {
-        super("fusionSlam");
+    public FusionSlamService(FusionSlam FusionSlam,CountDownLatch latch) {
+        super("fusionSlam",latch);
         this.fusionSlam = FusionSlam;
     }
 

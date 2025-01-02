@@ -2,6 +2,8 @@ package bgu.spl.mics;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+
 import bgu.spl.mics.application.objects.ServiceCounter;
 import bgu.spl.mics.application.objects.StatisticalFolder;
 
@@ -30,15 +32,17 @@ public abstract class MicroService implements Runnable {
     protected ConcurrentHashMap<Class<? extends Message>, Callback<?>> messageCallBack = new ConcurrentHashMap<>();
     private MessageBusImpl msg_bus;
     protected StatisticalFolder statsManager;
+    protected CountDownLatch latch;
 
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
      *             does not have to be unique)
      */
-    public MicroService(String name) {
+    public MicroService(String name, CountDownLatch latch) {
         this.name = name;
         this.msg_bus = MessageBusImpl.getInstance();
         this.statsManager = StatisticalFolder.getInstance();
+        this.latch = latch;
 
     }
 
@@ -179,10 +183,24 @@ public abstract class MicroService implements Runnable {
     @Override
     public final void run() {
         msg_bus.register(this);
+        System.out.println("MicroService " + getName() + " started");
+
         initialize();
+        System.out.println("MicroService " + getName() + " Initialized");
+
+        latch.countDown();
+        try {
+            // Wait until the latch count reaches zero
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.out.println("Main thread interrupted!");
+        }
         ServiceCounter.getInstance().incrementThreads();
         while (!terminated) {
             try {
+                System.out.println("MicroService " + getName() + " isRunning");
+
                 Message msg = msg_bus.awaitMessage(this);
                 if (msg != null) {
                     System.out.println(getName() + " processing message: " + msg.getClass().getSimpleName());
@@ -194,9 +212,12 @@ public abstract class MicroService implements Runnable {
             Thread.currentThread().interrupt();
             // terminate();
         }
-        
+        System.out.println(getName() + " terminated: " );
+
     }
     msg_bus.unregister(this);
+    System.out.println("msg_bus unregistered: " + getName());
+
 
 }
 }

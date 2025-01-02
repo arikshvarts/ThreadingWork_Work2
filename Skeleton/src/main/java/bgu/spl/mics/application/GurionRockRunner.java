@@ -2,6 +2,7 @@ package bgu.spl.mics.application;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import bgu.spl.mics.Configuration;
@@ -61,8 +62,8 @@ public class GurionRockRunner {
     ArrayList<Pose> PoseData=null;
 
     try {
-        // parsingJsonFiles = new ParsingJsonFiles("C:\\Users\\ariks\\uni\\CodingEnviroments\\Work2_Threading\\Skeleton\\example input\\configuration_file.json");
-        parsingJsonFiles = new ParsingJsonFiles("C:\\Users\\עדו רבין\\OneDrive\\מסמכים\\GitHub\\ThreadingWork_Work2\\Skeleton\\example_input_with_error\\configuration_file.json");
+        parsingJsonFiles = new ParsingJsonFiles("C:\\Users\\ariks\\uni\\CodingEnviroments\\Work2_Threading\\Skeleton\\example input\\configuration_file.json");
+        // parsingJsonFiles = new ParsingJsonFiles("C:\\Users\\עדו רבין\\OneDrive\\מסמכים\\GitHub\\ThreadingWork_Work2\\Skeleton\\example_input_with_error\\configuration_file.json");
         System.err.println("Done parsing");
     
     
@@ -106,35 +107,28 @@ public class GurionRockRunner {
         int frequency = config.frequency;
         Lidars.add(new LiDarWorkerTracker(id, frequency));
     }
-    
+    List<Thread> microserviceThreads = new ArrayList<>();
+
     latch = new CountDownLatch(Cameras.size()+3+Lidars.size());
-    TimeService timeservice = new TimeService(parsingJsonFiles.getConfiguration().TickTime, parsingJsonFiles.getConfiguration().Duration);
+    microserviceThreads.add(new Thread(new TimeService(parsingJsonFiles.getConfiguration().TickTime, parsingJsonFiles.getConfiguration().Duration,latch)));
     FusionSlam fusionSlam = new FusionSlam();
-    FusionSlamService slamservice = new FusionSlamService(fusionSlam);
+    microserviceThreads.add(new Thread(new FusionSlamService(fusionSlam,latch)));
     
-    // PoseService poseservice = new PoseService(gps);
+    microserviceThreads.add(new Thread(new PoseService(gps,latch)));
     for (int i = 0; i < Cameras.size(); i++) {
-        CameraServices.add(new CameraService(Cameras.get(i)));
+        microserviceThreads.add(new Thread(new CameraService(Cameras.get(i),latch)));
     }
     LiDarDataBase.getInstance().getCloudPoints();
     for (int i = 0; i < Lidars.size(); i++) {
-        LiDarServices.add(new LiDarService(Lidars.get(i)));
+        microserviceThreads.add(new Thread(new LiDarService(Lidars.get(i),latch)));
     }
     ErrorInfo.initalize(Cameras.size(), Lidars.size());
     //sending the keys names to the ErrorInfo
     for(Camera cam : Cameras){ErrorInfo.getInstance().add_cameras_keys_match_frame(cam.getKey());}
 
-    //need to do count down latch here somewhere
-    slamservice.run();
-    // poseservice.run();
-    for (int i = 0; i < CameraServices.size(); i++) {
-        CameraServices.get(i).run();
+    for (Thread thread : microserviceThreads) {
+        thread.start();
     }
-    for (int i = 0; i < LiDarServices.size(); i++) {
-        LiDarServices.get(i).run();
-    }
-
-    timeservice.run();
 
 
 System.err.println("Done running");

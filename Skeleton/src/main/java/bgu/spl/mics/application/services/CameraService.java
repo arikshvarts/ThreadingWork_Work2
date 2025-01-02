@@ -1,6 +1,6 @@
 package bgu.spl.mics.application.services;
 
-import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 
 import bgu.spl.mics.Future;
 import bgu.spl.mics.MessageBusImpl;
@@ -10,13 +10,11 @@ import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.DetectObjectsEvent;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
-import bgu.spl.mics.application.messages.TrackedObjectsEvent;
 import bgu.spl.mics.application.objects.Camera;
 import bgu.spl.mics.application.objects.DetectedObject;
 import bgu.spl.mics.application.objects.STATUS;
 import bgu.spl.mics.application.objects.ServiceCounter;
 import bgu.spl.mics.application.objects.StatisticalFolder;
-import bgu.spl.mics.application.objects.TrackedObject;
 
 /**
  * CameraService is responsible for processing data from the camera and sending
@@ -39,13 +37,13 @@ public class CameraService extends MicroService {
      * @param camera The Camera object that this service will use to detect
      * objects.
      */
-    public CameraService(Camera camera) {
-        super("Camera");
+    public CameraService(Camera camera,CountDownLatch latch){
+        super("Camera",latch);
         this.camera = camera;
         //leshanot barega shehapirsor over mitoch hacemra lemakom aher
         this.last_detected_time = camera.get_last_detected_time();
         this.stat = StatisticalFolder.getInstance();
-        this.last_frame = new DetectObjectsEvent(0, new ArrayList<DetectedObject>()); //NEED to check if initialize to null can cause an error in case of ErrorInfo trying to tostring this
+        this.last_frame = null; //NEED to check if initialize to null can cause an error in case of ErrorInfo trying to tostring this
 
     }
 
@@ -67,6 +65,7 @@ public class CameraService extends MicroService {
             //stop after last time you detected something + the frequency
             camera.setStatus(STATUS.DOWN);
             ServiceCounter.getInstance().decrementThreads();
+
                 terminate();
         }
         else{
@@ -83,10 +82,6 @@ public class CameraService extends MicroService {
                 if(eve.getObjects().isEmpty() == false ) {
                     //update last_frame and send DetectObjectsEvent only if the camera saw something
                     last_frame = eve; // the last time the camera processed the envirmoent, it means, what the camera saw at currTime - frequency 
-                    //updating the last frame to the ErrorInfo
-                    ErrorInfo.getInstance().UpdateCamerasLastFrames(last_frame, camera.getKey());
-
-                    
                     //send only if frequency delay passed (handeled by handle tick)
                     for(DetectedObject det : eve.getObjects()){
                         if (det.getId() == "ERROR"){
@@ -121,6 +116,7 @@ public class CameraService extends MicroService {
 
 
         subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast c) -> {
+            // ErrorInfo.getInstance().AddCamerasLastFrames(last_frame); //updating the last frame to the ErrorInfo
             camera.setStatus(STATUS.DOWN);
             ServiceCounter.getInstance().decrementThreads();
 
