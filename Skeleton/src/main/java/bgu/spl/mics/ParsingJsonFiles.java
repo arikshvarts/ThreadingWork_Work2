@@ -36,8 +36,8 @@ public class ParsingJsonFiles {
     public ArrayList<StampedCloudPoints> lidarData2Pts;
 
     public ArrayList<Pose> PoseData;
-    public ArrayList<Camera> Cameras ;
-    public ArrayList<LiDarWorkerTracker> Lidars ;
+    public static ArrayList<Camera> Cameras ;
+    public static ArrayList<LiDarWorkerTracker> Lidars ;
     public LiDarDataBase db;
     public GPSIMU gps;
 
@@ -58,6 +58,8 @@ public class ParsingJsonFiles {
             return gson.fromJson(reader, type);
         }
     }
+    public static int num_of_cameras(){ return Cameras.size();}
+
 
     public ArrayList<lidarData> parseLidarData() throws IOException {
         Gson gson = new Gson();
@@ -68,6 +70,8 @@ public class ParsingJsonFiles {
             return gson.fromJson(reader, type);
         }
     }
+
+    public static int num_of_lidars(){ return Lidars.size();}
 
     public ArrayList<Pose> parsePoseData() throws IOException {
         Gson gson = new Gson();
