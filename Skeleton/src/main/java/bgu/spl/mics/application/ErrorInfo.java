@@ -12,7 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import com.google.gson.GsonBuilder;
 
-
+import bgu.spl.mics.ParsingJsonFiles;
 import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.DetectObjectsEvent;
 import bgu.spl.mics.application.messages.TrackedObjectsEvent;
@@ -21,6 +21,7 @@ import bgu.spl.mics.application.objects.DetectedObject;
 import bgu.spl.mics.application.objects.Pose;
 import bgu.spl.mics.application.objects.StatisticalFolder;
 import bgu.spl.mics.application.objects.TrackedObject;
+import bgu.spl.mics.ParsingJsonFiles;
 
 public class ErrorInfo {
     private ArrayList<DetectObjectsEvent> cameras_last_frames; //the last frame of all the cameras
@@ -33,7 +34,13 @@ public class ErrorInfo {
     
     public ErrorInfo() {
         this.cameras_last_frames = new ArrayList<>();
+        for(int i=0 ; i<ParsingJsonFiles.num_of_cameras() ; i++){
+            cameras_last_frames.add(new DetectObjectsEvent(0, new ArrayList<DetectedObject>()));
+        }
         this.lidars_last_frames = new ArrayList<>();
+        for(int i=0 ; i<ParsingJsonFiles.num_of_lidars() ; i++){
+            lidars_last_frames.add(new TrackedObjectsEvent(new ArrayList<TrackedObject>(), 0));
+        }
         this.poses = new ArrayList<>();
         this.stat = StatisticalFolder.getInstance();
         this.cameras_keys_match_frame = new ArrayList<>();
@@ -56,6 +63,7 @@ public class ErrorInfo {
         return ErrorInfoHolder.INSTANCE;
     }
 
+
     // Getter and Setter methods for the fields
     
     public void set_crashed_brod(CrashedBroadcast c){
@@ -66,16 +74,18 @@ public class ErrorInfo {
         return cameras_last_frames;
     }
 
-    public void AddCamerasLastFrames(DetectObjectsEvent frame) {
-        cameras_last_frames.add(frame);
+    public void UpdateCamerasLastFrames(DetectObjectsEvent frame, String key) {
+        int index = cameras_keys_match_frame.indexOf(key);
+        //updating the camera in the index matching the key with last frame
+        cameras_last_frames.set(index, frame);
     }
 
     public ArrayList<TrackedObjectsEvent> getLidarsLastFrames() {
         return lidars_last_frames;
     }
 
-    public void AddLidarsLastFrames(TrackedObjectsEvent frame) {
-        lidars_last_frames.add(frame);
+    public void UpdateLidarsLastFrames(TrackedObjectsEvent frame, int Lidar_ID) {
+        lidars_last_frames.set(Lidar_ID - 1 , frame) ;
     }
 
     public ArrayList<Pose> getPoses() {

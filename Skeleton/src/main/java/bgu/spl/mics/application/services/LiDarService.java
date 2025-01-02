@@ -14,6 +14,7 @@ import bgu.spl.mics.application.objects.LiDarWorkerTracker;
 import bgu.spl.mics.application.objects.STATUS;
 import bgu.spl.mics.application.objects.ServiceCounter;
 import bgu.spl.mics.application.objects.StatisticalFolder;
+import bgu.spl.mics.application.objects.TrackedObject;
 
 
 /**
@@ -39,7 +40,7 @@ public class LiDarService extends MicroService {
         super("Lidar");
         this.liDarTracker = liDarTracker;
         this.stat = StatisticalFolder.getInstance();
-        this.last_frame = null;
+        this.last_frame = new TrackedObjectsEvent(new ArrayList<TrackedObject>(), 0);
 
 
     }
@@ -63,11 +64,10 @@ public class LiDarService extends MicroService {
 
 
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast c) -> {
-                      if(c.getCurrentTick() > last_detected_time + liDarTracker.getFrequency())   {
+            if(c.getCurrentTick() > last_detected_time + liDarTracker.getFrequency())   {
             //stop after last time you detected something + the frequency
             liDarTracker.setStatus(STATUS.DOWN);
             ServiceCounter.getInstance().decrementThreads();
-
                 terminate();
             }
             else{
@@ -78,6 +78,8 @@ public class LiDarService extends MicroService {
                                 //currTick > eve.time + freq  if the camera frequency greater than lidar frequency
                                 stat.incrementTrackedObjects(eve.getTrackedObjects().size());
                                 last_frame = eve; // last_frame is the last TrackedObjectsEvent we sent
+                                //updating the last frame to the ErrorInfo
+                                ErrorInfo.getInstance().UpdateLidarsLastFrames(last_frame, liDarTracker.getId());
                                 sendEvent(eve);
                                 events_to_send.remove(eve);
                                 
@@ -100,8 +102,6 @@ public class LiDarService extends MicroService {
 
 
         subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast c) -> {
-            ErrorInfo.getInstance().AddLidarsLastFrames(last_frame); //updating the last frame to the ErrorInfo
-
             ServiceCounter.getInstance().decrementThreads();
 
 
