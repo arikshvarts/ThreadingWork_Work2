@@ -7,6 +7,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * Write your implementation here!
  * Only private fields and methods can be added to this class.
  */
+
+import bgu.spl.mics.application.messages.DetectObjectsEvent;
 public class MessageBusImpl implements MessageBus {
     
         private final ConcurrentHashMap<MicroService, BlockingQueue<Message>> MicroServices_Queues = new ConcurrentHashMap<>();
@@ -29,8 +31,9 @@ public class MessageBusImpl implements MessageBus {
         @Override
         public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
       
-                 event_Subscribers.computeIfAbsent(type, k -> new LinkedBlockingQueue<>()).add(m);
-        }
+            event_Subscribers.computeIfAbsent(type, k -> new LinkedBlockingQueue<>()).add(m);
+            System.out.println(m.getName() + "is subscribing to: " + type.getName());                    
+        } 
     
         @Override
         public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
@@ -69,6 +72,7 @@ public class MessageBusImpl implements MessageBus {
                 rwLock.readLock().lock();
                 BlockingQueue<MicroService> subscribers = event_Subscribers.get(event.getClass());
                 if (subscribers == null || subscribers.isEmpty()) {
+                    System.err.println("No subscribers found for event: " + event.getClass().getName());                    
                     return null;
                 }
                 try {

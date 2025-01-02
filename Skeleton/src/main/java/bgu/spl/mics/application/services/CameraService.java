@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.services;
 
+import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 
 import bgu.spl.mics.Future;
@@ -40,7 +41,6 @@ public class CameraService extends MicroService {
     public CameraService(Camera camera,CountDownLatch latch){
         super("Camera",latch);
         this.camera = camera;
-        //leshanot barega shehapirsor over mitoch hacemra lemakom aher
         this.last_detected_time = camera.get_last_detected_time();
         this.stat = StatisticalFolder.getInstance();
         this.last_frame = new DetectObjectsEvent(0, new ArrayList<DetectedObject>()); //NEED to check if initialize to null can cause an error in case of ErrorInfo trying to tostring this
@@ -99,7 +99,7 @@ public class CameraService extends MicroService {
                     Future<Boolean> fut = MessageBusImpl.getInstance().sendEvent(eve);
                     if (fut.get() == false) {
                         sendBroadcast(new CrashedBroadcast(getName(), "Failure occurred while processing DetectObjectsEvent."));
-                        //lo BATUAH im nachon hasend Crashrd
+                        //dont sure if its correct to semd crashed here
                     }
                     
                 }
