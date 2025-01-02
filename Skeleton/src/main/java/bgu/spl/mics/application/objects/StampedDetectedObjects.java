@@ -8,8 +8,8 @@ import java.util.ArrayList;
 
 public class StampedDetectedObjects {
 
-    private final int time; // The time at which the objects were detected
-    private final ArrayList<DetectedObject> detectedObjects; // List of detected objects
+    public final int time; // The time at which the objects were detected
+    public final ArrayList<DetectedObject> detectedObjects; // List of detected objects
 
     public StampedDetectedObjects(int time, ArrayList<DetectedObject> detectedObjects) {
         this.time = time;

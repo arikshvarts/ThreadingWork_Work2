@@ -26,6 +26,7 @@ import bgu.spl.mics.application.objects.StampedDetectedObjects;
 import bgu.spl.mics.application.objects.StatisticalFolder;
 import bgu.spl.mics.application.objects.TrackedObject;
 import bgu.spl.mics.application.objects.lidarData;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * The main entry point for the GurionRock Pro Max Ultra Over 9000 simulation.
@@ -50,12 +51,15 @@ public class GurionRockRunner {
     // String configDirectory;
     ArrayList<lidarData> lidarData3Pts;
     ArrayList<StampedCloudPoints> lidarData2Pts;
-    ArrayList<Pose> PoseData;
     ArrayList<Camera> Cameras ;
     ArrayList<LiDarWorkerTracker> Lidars ;
     LiDarDataBase db;
-    GPSIMU gps;
+    GPSIMU gps=null;
     ParsingJsonFiles parsingJsonFiles = null;
+    CountDownLatch latch;
+    Map<String, ArrayList<StampedDetectedObjects>> cameraData=null;
+    ArrayList<Pose> PoseData=null;
+
     try {
         // parsingJsonFiles = new ParsingJsonFiles("C:\\Users\\ariks\\uni\\CodingEnviroments\\Work2_Threading\\Skeleton\\example input\\configuration_file.json");
         parsingJsonFiles = new ParsingJsonFiles("C:\\Users\\עדו רבין\\OneDrive\\מסמכים\\GitHub\\ThreadingWork_Work2\\Skeleton\\example_input_with_error\\configuration_file.json");
@@ -68,7 +72,7 @@ public class GurionRockRunner {
     }
     Cameras = new ArrayList<>();
     Lidars = new ArrayList<>();
-    Map<String, ArrayList<StampedDetectedObjects>> cameraData=null;
+
     try {
         cameraData = parsingJsonFiles.parseCameraData();
         lidarData3Pts = parsingJsonFiles.parseLidarData();
@@ -81,10 +85,19 @@ public class GurionRockRunner {
     }
     gps = new GPSIMU();
     ArrayList<String> cameras_keys = new ArrayList<>();
+    //sending the keys names to the ErrorInfo
+
+    gps.setPoseList(PoseData);
+    
+    System.out.println("Done parsing");
+    ArrayList<CameraService> CameraServices = new ArrayList<>();  
+    ArrayList<LiDarService> LiDarServices = new ArrayList<>();  
+
     for (CameraConfiguration config : parsingJsonFiles.configuration.Cameras.CamerasConfigurations) {
         int id = config.id;
         int frequency = config.frequency;
         String key = config.camera_key;
+        Cameras.add(new Camera(id, frequency,key,cameraData.get(key)));
 
     }
     
@@ -96,17 +109,13 @@ public class GurionRockRunner {
     //sending the keys names to the ErrorInfo
     for(Camera cam : Cameras){ErrorInfo.getInstance().add_cameras_keys_match_frame(cam.getKey());}
 
-    gps.setCurrentTick(0);
-    gps.setPoseList(parsingJsonFiles.PoseData);
     
-    System.out.println("Done parsing");
-    ArrayList<CameraService> CameraServices = new ArrayList<>();  
-    ArrayList<LiDarService> LiDarServices = new ArrayList<>();  
-
+    latch = new CountDownLatch(Cameras.size()+3+Lidars.size());
     TimeService timeservice = new TimeService(parsingJsonFiles.getConfiguration().TickTime, parsingJsonFiles.getConfiguration().Duration);
     FusionSlam fusionSlam = new FusionSlam();
     FusionSlamService slamservice = new FusionSlamService(fusionSlam);
-    PoseService poseservice = new PoseService(parsingJsonFiles.gps);
+    
+    // PoseService poseservice = new PoseService(gps);
     for (int i = 0; i < Cameras.size(); i++) {
         CameraServices.add(new CameraService(Cameras.get(i)));
     }
@@ -118,7 +127,7 @@ public class GurionRockRunner {
 
     //need to do count down latch here somewhere
     slamservice.run();
-    poseservice.run();
+    // poseservice.run();
     for (int i = 0; i < CameraServices.size(); i++) {
         CameraServices.get(i).run();
     }
@@ -127,6 +136,7 @@ public class GurionRockRunner {
     }
 
     timeservice.run();
+
 
 System.err.println("Done running");
 

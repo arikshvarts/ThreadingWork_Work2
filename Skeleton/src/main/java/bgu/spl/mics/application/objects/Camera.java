@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.objects;
 
+import java.security.Key;
 import java.util.ArrayList;
 
 
@@ -34,9 +35,6 @@ public class Camera {
         this.last_detected_time = CameraData.get(CameraData.size()-1).getTime();
     }
 
-    public String getKey(){
-        return cameraKey;
-    }
 
     public int getId() {
         return id;
@@ -52,6 +50,13 @@ public class Camera {
 
     public void setFrequency(int frequency) {
         this.frequency = frequency;
+    }
+    public String getKey(){
+        return cameraKey;
+    }
+
+    public void setKey(String key) {
+        this.cameraKey = key;
     }
 
     public STATUS getStatus() {
