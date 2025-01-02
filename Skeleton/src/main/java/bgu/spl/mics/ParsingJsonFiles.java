@@ -58,8 +58,6 @@ public class ParsingJsonFiles {
             return gson.fromJson(reader, type);
         }
     }
-    public static int num_of_cameras(){ return Cameras.size();}
-
 
     public ArrayList<lidarData> parseLidarData() throws IOException {
         Gson gson = new Gson();

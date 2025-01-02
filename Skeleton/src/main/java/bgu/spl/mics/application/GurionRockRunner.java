@@ -57,7 +57,8 @@ public class GurionRockRunner {
     GPSIMU gps;
     ParsingJsonFiles parsingJsonFiles = null;
     try {
-        parsingJsonFiles = new ParsingJsonFiles("C:\\Users\\ariks\\uni\\CodingEnviroments\\Work2_Threading\\Skeleton\\example input\\configuration_file.json");
+        // parsingJsonFiles = new ParsingJsonFiles("C:\\Users\\ariks\\uni\\CodingEnviroments\\Work2_Threading\\Skeleton\\example input\\configuration_file.json");
+        parsingJsonFiles = new ParsingJsonFiles("C:\\Users\\עדו רבין\\OneDrive\\מסמכים\\GitHub\\ThreadingWork_Work2\\Skeleton\\example_input_with_error\\configuration_file.json");
         System.err.println("Done parsing");
     
     
@@ -110,9 +111,11 @@ public class GurionRockRunner {
         CameraServices.add(new CameraService(Cameras.get(i)));
     }
     LiDarDataBase.getInstance().getCloudPoints();
-    for (int i = 0; i < Cameras.size(); i++) {
+    for (int i = 0; i < Lidars.size(); i++) {
         LiDarServices.add(new LiDarService(Lidars.get(i)));
     }
+    ErrorInfo.initalize(Cameras.size(), Lidars.size());
+
     //need to do count down latch here somewhere
     slamservice.run();
     poseservice.run();
@@ -122,9 +125,14 @@ public class GurionRockRunner {
     for (int i = 0; i < LiDarServices.size(); i++) {
         LiDarServices.get(i).run();
     }
+
     timeservice.run();
 
 System.err.println("Done running");
+
+
+
+
 
     }
 
@@ -159,51 +167,51 @@ System.err.println("Done running");
 //     private StatisticalFolder stat;
 
 //TESTING the error output file
-        // DetectedObject obj1 = new DetectedObject("obj1", "descr1");
-        // DetectedObject obj2 = new DetectedObject("obj2", "descr2");
-        // ArrayList<DetectedObject> objects = new ArrayList<DetectedObject>();
-        // objects.add(obj1); objects.add(obj2);
-        // DetectObjectsEvent det_eve_1 = new DetectObjectsEvent(2, objects);
-        // ArrayList<String> cameras_keys = new ArrayList<>();
-        // cameras_keys.add("Camera1"); cameras_keys.add("Camera2");
-        // DetectedObject obj3 = new DetectedObject("obj3", "descr3");
-        // ArrayList<DetectedObject> objects2 = new ArrayList<DetectedObject>();
-        // objects2.add(obj3);
-        // DetectObjectsEvent det_eve_2 = new DetectObjectsEvent(2, objects2);
-        // final ArrayList<DetectObjectsEvent> cameras_last_frames = new ArrayList<>();
-        // cameras_last_frames.add(det_eve_1); cameras_last_frames.add(det_eve_2); //camera last frames
+// DetectedObject obj1 = new DetectedObject("obj1", "descr1");
+// DetectedObject obj2 = new DetectedObject("obj2", "descr2");
+// ArrayList<DetectedObject> objects = new ArrayList<DetectedObject>();
+// objects.add(obj1); objects.add(obj2);
+// DetectObjectsEvent det_eve_1 = new DetectObjectsEvent(2, objects);
+// ArrayList<String> cameras_keys = new ArrayList<>();
+// cameras_keys.add("Camera1"); cameras_keys.add("Camera2");
+// DetectedObject obj3 = new DetectedObject("obj3", "descr3");
+// ArrayList<DetectedObject> objects2 = new ArrayList<DetectedObject>();
+// objects2.add(obj3);
+// DetectObjectsEvent det_eve_2 = new DetectObjectsEvent(2, objects2);
+// final ArrayList<DetectObjectsEvent> cameras_last_frames = new ArrayList<>();
+// cameras_last_frames.add(det_eve_1); cameras_last_frames.add(det_eve_2); //camera last frames
 
-        //         ArrayList<CloudPoint> coordinates1 = new ArrayList<>();
-        // coordinates1.add(new CloudPoint(1.0, 2.0));
-        // coordinates1.add(new CloudPoint(4.0, 5.0));
+//         ArrayList<CloudPoint> coordinates1 = new ArrayList<>();
+// coordinates1.add(new CloudPoint(1.0, 2.0));
+// coordinates1.add(new CloudPoint(4.0, 5.0));
 
-        // ArrayList<CloudPoint> coordinates2 = new ArrayList<>();
-        // coordinates2.add(new CloudPoint(7.0, 8.0));
-        // coordinates2.add(new CloudPoint(10.0, 11.0));
+// ArrayList<CloudPoint> coordinates2 = new ArrayList<>();
+// coordinates2.add(new CloudPoint(7.0, 8.0));
+// coordinates2.add(new CloudPoint(10.0, 11.0));
 
-        // // Create instances of TrackedObject
-        // TrackedObject trackedObject1 = new TrackedObject("Object1", "first tracked object", coordinates1, 2);
-        // TrackedObject trackedObject2 = new TrackedObject("Object2", "second tracked object", coordinates2, 2);
-        // ArrayList<TrackedObject> tr_eve= new ArrayList<>();
-        // final ArrayList<TrackedObjectsEvent> lidars_last_frames = new ArrayList<>();
-        // lidars_last_frames.add(new TrackedObjectsEvent(tr_eve, 2));
-        // ArrayList<Pose> poses = new ArrayList<>();
-        // Pose pose1 = new Pose(10.5, 20.3, 1.57, 100);
-        // Pose pose2 = new Pose(15.0, 25.5, 0.78, 100);
-        // poses.add(pose1); poses.add(pose2); //poses
-        // StatisticalFolder stat = StatisticalFolder.getInstance();
-        // stat.incrementDetectedObjects(2);
-        // stat.incrementDetectedObjects(4);
-        // stat.incrementLandmarks(5);
+// // Create instances of TrackedObject
+// TrackedObject trackedObject1 = new TrackedObject("Object1", "first tracked object", coordinates1, 2);
+// TrackedObject trackedObject2 = new TrackedObject("Object2", "second tracked object", coordinates2, 2);
+// ArrayList<TrackedObject> tr_eve= new ArrayList<>();
+// final ArrayList<TrackedObjectsEvent> lidars_last_frames = new ArrayList<>();
+// lidars_last_frames.add(new TrackedObjectsEvent(tr_eve, 2));
+// ArrayList<Pose> poses = new ArrayList<>();
+// Pose pose1 = new Pose(10.5, 20.3, 1.57, 100);
+// Pose pose2 = new Pose(15.0, 25.5, 0.78, 100);
+// poses.add(pose1); poses.add(pose2); //poses
+// StatisticalFolder stat = StatisticalFolder.getInstance();
+// stat.incrementDetectedObjects(2);
+// stat.incrementDetectedObjects(4);
+// stat.incrementLandmarks(5);
 
-        // //now create the ErrorInfo instance
-        // ErrorInfo err_info = new ErrorInfo();
-        // err_info.AddCamerasLastFrames(det_eve_1); err_info.AddCamerasLastFrames(det_eve_2);
-        // err_info.AddLidarsLastFrames(new TrackedObjectsEvent(tr_eve, 2));
-        // err_info.setPoses(poses);
-        // err_info.set_crashed_brod(new CrashedBroadcast("faulty service", "err message"));
-        // err_info.add_cameras_keys_match_frame("Camera1");
-        // err_info.add_cameras_keys_match_frame("Camera2");
-        // err_info.createOutput();
+// //now create the ErrorInfo instance
+// ErrorInfo err_info = new ErrorInfo(Cameras.size(), Lidars.size());
+// err_info.UpdateCamerasLastFrames(det_eve_1); err_info.UpdateCamerasLastFrames(det_eve_2);
+// err_info.UpdateLidarsLastFrames(new TrackedObjectsEvent(tr_eve, 2));
+// err_info.setPoses(poses);
+// err_info.set_crashed_brod(new CrashedBroadcast("faulty service", "err message"));
+// err_info.add_cameras_keys_match_frame("Camera1");
+// err_info.add_cameras_keys_match_frame("Camera2");
+// err_info.createOutput();
     }
 
