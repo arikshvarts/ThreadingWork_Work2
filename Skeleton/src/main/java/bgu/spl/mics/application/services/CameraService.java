@@ -46,7 +46,8 @@ public class CameraService extends MicroService {
         this.last_detected_time = camera.get_last_detected_time();
         this.stat = StatisticalFolder.getInstance();
         this.last_frame = new DetectObjectsEvent(0, new ArrayList<DetectedObject>()); //NEED to check if initialize to null can cause an error in case of ErrorInfo trying to tostring this
-
+        //if there is a crashedBroadcast from another sensor before the first "frame" the cmaera detect, its last_frame in the error output will be time:0 with an empty list
+        ErrorInfo.getInstance().UpdateCamerasLastFrames(last_frame, camera.getKey()); 
     }
 
     /**
