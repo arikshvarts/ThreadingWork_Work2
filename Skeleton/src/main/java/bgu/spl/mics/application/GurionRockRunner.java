@@ -44,6 +44,7 @@ public class GurionRockRunner {
      * @param args Command-line arguments. The first argument is expected to be
      * the path to the configuration file.
      */
+    
     public static void main(String[] args) {
     // Configuration configuration;
     // String configDirectory;
@@ -78,18 +79,22 @@ public class GurionRockRunner {
         e.printStackTrace();
     }
     gps = new GPSIMU();
+    ArrayList<String> cameras_keys = new ArrayList<>();
     for (CameraConfiguration config : parsingJsonFiles.configuration.Cameras.CamerasConfigurations) {
         int id = config.id;
         int frequency = config.frequency;
         String key = config.camera_key;
 
-        Cameras.add(new Camera(id, frequency,key,cameraData.get(key)));
     }
+    
     for (LidarConfiguration config : parsingJsonFiles.configuration.LiDarWorkers.LidarConfigurations) {
         int id = config.id;
         int frequency = config.frequency;
         Lidars.add(new LiDarWorkerTracker(id, frequency));
     }
+    //sending the keys names to the ErrorInfo
+    for(Camera cam : Cameras){ErrorInfo.getInstance().add_cameras_keys_match_frame(cam.getKey());}
+
     gps.setCurrentTick(0);
     gps.setPoseList(parsingJsonFiles.PoseData);
     
