@@ -35,6 +35,9 @@ public class Camera {
         this.last_detected_time = CameraData.get(CameraData.size()-1).getTime();
     }
 
+    public String getkey(){
+        return cameraKey;
+    }
 
     public int getId() {
         return id;

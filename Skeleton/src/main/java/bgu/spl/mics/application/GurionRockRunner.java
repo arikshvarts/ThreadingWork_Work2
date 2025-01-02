@@ -106,9 +106,6 @@ public class GurionRockRunner {
         int frequency = config.frequency;
         Lidars.add(new LiDarWorkerTracker(id, frequency));
     }
-    //sending the keys names to the ErrorInfo
-    for(Camera cam : Cameras){ErrorInfo.getInstance().add_cameras_keys_match_frame(cam.getKey());}
-
     
     latch = new CountDownLatch(Cameras.size()+3+Lidars.size());
     TimeService timeservice = new TimeService(parsingJsonFiles.getConfiguration().TickTime, parsingJsonFiles.getConfiguration().Duration);
@@ -124,6 +121,8 @@ public class GurionRockRunner {
         LiDarServices.add(new LiDarService(Lidars.get(i)));
     }
     ErrorInfo.initalize(Cameras.size(), Lidars.size());
+    //sending the keys names to the ErrorInfo
+    for(Camera cam : Cameras){ErrorInfo.getInstance().add_cameras_keys_match_frame(cam.getKey());}
 
     //need to do count down latch here somewhere
     slamservice.run();
