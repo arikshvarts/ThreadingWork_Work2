@@ -32,13 +32,13 @@ public class ErrorInfo {
     private CrashedBroadcast crash;
 
     
-    public ErrorInfo() {
+    public ErrorInfo(int num_of_cameras, int num_of_lidars) {
         this.cameras_last_frames = new ArrayList<>();
-        for(int i=0 ; i<ParsingJsonFiles.num_of_cameras() ; i++){
+        for(int i=0 ; i<num_of_cameras ; i++){
             cameras_last_frames.add(new DetectObjectsEvent(0, new ArrayList<DetectedObject>()));
         }
         this.lidars_last_frames = new ArrayList<>();
-        for(int i=0 ; i<ParsingJsonFiles.num_of_lidars() ; i++){
+        for(int i=0 ; i<num_of_lidars ; i++){
             lidars_last_frames.add(new TrackedObjectsEvent(new ArrayList<TrackedObject>(), 0));
         }
         this.poses = new ArrayList<>();
@@ -52,7 +52,7 @@ public class ErrorInfo {
      * This ensures lazy initialization and thread safety without requiring synchronization.
      */
     private static class ErrorInfoHolder {
-        private static final ErrorInfo INSTANCE = new ErrorInfo();
+        private static ErrorInfo INSTANCE = null;
     }
 
     /**
@@ -60,7 +60,19 @@ public class ErrorInfo {
      * @return the singleton instance of ErrorInfo
      */
     public static ErrorInfo getInstance() {
+        if(ErrorInfoHolder.INSTANCE != null){
         return ErrorInfoHolder.INSTANCE;
+        }
+        else{ throw new IllegalStateException("ErrorInfo has not been initialized yet!");}
+    }
+
+    public static void initalize(int num_of_cameras, int num_of_lidars){
+        if(ErrorInfoHolder.INSTANCE == null){
+            ErrorInfoHolder.INSTANCE = new ErrorInfo(num_of_cameras, num_of_lidars);
+        }
+        else{
+            throw new IllegalStateException("ErrorInfo has already been initialized!");
+        }
     }
 
 

@@ -31,7 +31,8 @@ public class Camera {
         this.frequency = frequency;
         this.cameraKey= CameraKey;
         this.CameraData = camDat;
-        this.last_detected_time = CameraData.getLast().getTime();
+        // this.last_detected_time = CameraData.getLast().getTime();
+        this.last_detected_time = CameraData.get(CameraData.size()-1).getTime();
     }
 
 
