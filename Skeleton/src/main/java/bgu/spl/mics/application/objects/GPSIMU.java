@@ -8,8 +8,8 @@ import java.util.ArrayList;
  * Provides information about the robot's position and movement.
  */
 public class GPSIMU {
-    private int currentTick;
-    private ArrayList<Pose> PoseList;
+    public int currentTick;
+    public ArrayList<Pose> PoseList;
 
     public GPSIMU() {
         this.currentTick = 0;
