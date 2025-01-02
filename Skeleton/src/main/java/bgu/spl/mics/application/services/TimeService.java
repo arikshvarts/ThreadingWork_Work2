@@ -3,6 +3,9 @@ import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.objects.StatisticalFolder;
 import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
+
+import java.util.concurrent.CountDownLatch;
+
 import bgu.spl.mics.Callback;
 import bgu.spl.mics.MicroService;
 
@@ -21,8 +24,8 @@ public class TimeService extends MicroService {
      * @param TickTime  The duration of each tick in milliseconds.
      * @param Duration  The total number of ticks before the service terminates.
      */
-    public TimeService(int TickTime, int Duration) {
-        super("TimeService");
+    public TimeService(int TickTime, int Duration, CountDownLatch latch) {
+        super("TimeService",latch);
         this.tickDuration = TickTime;
         this.totalTicks = Duration;
         this.currentTick = 0;

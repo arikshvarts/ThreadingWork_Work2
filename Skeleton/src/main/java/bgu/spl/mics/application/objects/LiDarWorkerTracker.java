@@ -54,6 +54,7 @@ public class LiDarWorkerTracker {
     
     public TrackedObjectsEvent handleDetectedObjectsEvent(DetectObjectsEvent det){
         ArrayList<TrackedObject> trackedObjects = new ArrayList<>();
+        System.out.println(det.getTime());
         ArrayList<StampedCloudPoints> objects_at_time  = LiDarDataBase.getInstance().getMapTimeHashMap().get(det.getTime());
         for(StampedCloudPoints tracked : objects_at_time){
             //need to continue and find from all tracked in this time in the hash, only yhe objects detected from camera

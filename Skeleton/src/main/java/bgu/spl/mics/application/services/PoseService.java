@@ -1,6 +1,7 @@
 package bgu.spl.mics.application.services;
 
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.ErrorInfo;
@@ -23,8 +24,8 @@ public class PoseService extends MicroService {
      *
      * @param gpsimu The GPSIMU object that provides the robot's pose data.
      */
-    public PoseService(GPSIMU gpsimu) {
-        super("PoseService");
+    public PoseService(GPSIMU gpsimu,CountDownLatch latch) {
+        super("PoseService",latch);
         this.gpsimu=gpsimu;
         this.kol_haposot = new ArrayList<>();    
     }
@@ -42,6 +43,11 @@ public class PoseService extends MicroService {
             if (pose != null) {
                 sendEvent(new PoseEvent(pose));
                 kol_haposot.add(pose);
+            }
+            else {
+                sendBroadcast(new TerminatedBroadcast(getName()+"No more data from GPSIMU"));
+                ErrorInfo.getInstance().setPoses(kol_haposot);
+                terminate();
             }
         });
         subscribeBroadcast(CrashedBroadcast.class, (CrashedBroadcast) ->
