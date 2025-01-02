@@ -84,29 +84,14 @@ public class GurionRockRunner {
     }
     gps = new GPSIMU();
     ArrayList<String> cameras_keys = new ArrayList<>();
-    for (CameraConfiguration config : parsingJsonFiles.configuration.Cameras.CamerasConfigurations) {
-        int id = config.id;
-        int frequency = config.frequency;
-        String key = config.camera_key;
-
-    }
-    
-    for (LidarConfiguration config : parsingJsonFiles.configuration.LiDarWorkers.LidarConfigurations) {
-        int id = config.id;
-        int frequency = config.frequency;
-        Lidars.add(new LiDarWorkerTracker(id, frequency));
-    }
     //sending the keys names to the ErrorInfo
-    for(Camera cam : Cameras){ErrorInfo.getInstance().add_cameras_keys_match_frame(cam.getKey());}
 
-    gps.setCurrentTick(0);
-    gps.setPoseList(parsingJsonFiles.PoseData);
+    gps.setPoseList(PoseData);
     
     System.out.println("Done parsing");
     ArrayList<CameraService> CameraServices = new ArrayList<>();  
     ArrayList<LiDarService> LiDarServices = new ArrayList<>();  
 
-    ArrayList<String> cameras_keys = new ArrayList<>();
     for (CameraConfiguration config : parsingJsonFiles.configuration.Cameras.CamerasConfigurations) {
         int id = config.id;
         int frequency = config.frequency;

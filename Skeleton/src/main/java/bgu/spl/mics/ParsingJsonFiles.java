@@ -31,15 +31,9 @@ import java.util.Map;
 public class ParsingJsonFiles {
     public Configuration configuration;
     public String configDirectory;
-    public Map<String, ArrayList<StampedDetectedObjects>> cameraData;
     public ArrayList<lidarData> lidarData3Pts;
     public ArrayList<StampedCloudPoints> lidarData2Pts;
 
-    public ArrayList<Pose> PoseData;
-    public static ArrayList<Camera> Cameras ;
-    public static ArrayList<LiDarWorkerTracker> Lidars ;
-    public LiDarDataBase db;
-    public GPSIMU gps;
 
     public ParsingJsonFiles(String configFilePath) throws IOException {
         Gson gson = new Gson();
