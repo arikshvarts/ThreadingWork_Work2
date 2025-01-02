@@ -7,10 +7,10 @@ import com.google.gson.JsonObject;
  * Includes x, y coordinates and the yaw angle relative to a global coordinate system.
  */
 public class Pose {
-    private final double x;
-    private final double y;
-    private final double yaw;
-    private final int time;
+    public final double x;
+    public final double y;
+    public final double yaw;
+    public final int time;
 
     public Pose(double x, double y, double yaw, int time) {
         this.x = x;
