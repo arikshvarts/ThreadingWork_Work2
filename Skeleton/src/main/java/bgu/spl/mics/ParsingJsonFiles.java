@@ -63,8 +63,6 @@ public class ParsingJsonFiles {
         }
     }
 
-    public static int num_of_lidars(){ return Lidars.size();}
-
     public ArrayList<Pose> parsePoseData() throws IOException {
         Gson gson = new Gson();
         String path = configuration.poseJsonFile;
