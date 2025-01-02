@@ -34,6 +34,11 @@ public class GPSIMU {
     }
 
     public Pose getTickAtTime() {
+        try{
         return this.PoseList.get(this.currentTick);
+        }
+        catch (IndexOutOfBoundsException e){
+            return null;
+        }
     }
 }
