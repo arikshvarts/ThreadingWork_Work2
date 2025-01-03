@@ -1,6 +1,7 @@
 package bgu.spl.mics.application.services;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
 
 import bgu.spl.mics.MicroService;
@@ -65,27 +66,26 @@ public class LiDarService extends MicroService {
 
 
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast c) -> {
-            if(c.getCurrentTick() > last_detected_time + liDarTracker.getFrequency())   {
-            //stop after last time you detected something + the frequency
+            if(c.getCurrentTick() > last_detected_time + liDarTracker.getFrequency() && events_to_send.isEmpty()==true)   {
+            //stop after last time you detected something + the frequency and haa nothing more to send (that may be after last T+F because of camera F)
             liDarTracker.setStatus(STATUS.DOWN);
             ServiceCounter.getInstance().decrementThreads();
                 terminate();
             }
             else{
                 if(liDarTracker.getStatus() == STATUS.UP){
-                    if(events_to_send != null){
-                        for(TrackedObjectsEvent eve : events_to_send) { //looping all proccessed events and check if ready to send
-                            if(c.getCurrentTick() >= eve.getTime() + liDarTracker.getFrequency()){
-                                //currTick > eve.time + freq  if the camera frequency greater than lidar frequency
+                    synchronized (events_to_send) {
+                        Iterator<TrackedObjectsEvent> iterator = events_to_send.iterator();
+                        while (iterator.hasNext()) {
+                            TrackedObjectsEvent eve = iterator.next();
+                            if (c.getCurrentTick() >= eve.getTime() + liDarTracker.getFrequency()) {
                                 stat.incrementTrackedObjects(eve.getTrackedObjects().size());
-                                last_frame = eve; // last_frame is the last TrackedObjectsEvent we sent
-                                //updating the last frame to the ErrorInfo
+                                last_frame = eve;
                                 ErrorInfo.getInstance().UpdateLidarsLastFrames(last_frame, liDarTracker.getId());
                                 sendEvent(eve);
-                                events_to_send.remove(eve);
-                                
+                                iterator.remove();  // Safe removal using iterator
                             }
-                        } 
+                        }
                     }
                 }
             }

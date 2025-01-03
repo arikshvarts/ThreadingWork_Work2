@@ -62,10 +62,9 @@ public class GurionRockRunner {
     ArrayList<Pose> PoseData=null;
 
     try {
-        parsingJsonFiles = new ParsingJsonFiles("C:\\Users\\ariks\\uni\\CodingEnviroments\\Work2_Threading\\Skeleton\\example input\\configuration_file.json");
-        // parsingJsonFiles = new ParsingJsonFiles("C:\\Users\\עדו רבין\\OneDrive\\מסמכים\\GitHub\\ThreadingWork_Work2\\Skeleton\\example_input_with_error\\configuration_file.json");
+        // parsingJsonFiles = new ParsingJsonFiles("C:\\Users\\ariks\\uni\\CodingEnviroments\\Work2_Threading\\Skeleton\\example input\\configuration_file.json");
+        parsingJsonFiles = new ParsingJsonFiles("C:\\Users\\עדו רבין\\OneDrive\\מסמכים\\GitHub\\ThreadingWork_Work2\\Skeleton\\example input\\configuration_file.json");
         System.err.println("Done parsing");
-    
     
     
     } catch (IOException e) {
@@ -107,6 +106,11 @@ public class GurionRockRunner {
         int frequency = config.frequency;
         Lidars.add(new LiDarWorkerTracker(id, frequency));
     }
+
+    ErrorInfo.initalize(Cameras.size(), Lidars.size());
+    //sending the keys names to the ErrorInfo
+    for(Camera cam : Cameras){ErrorInfo.getInstance().add_cameras_keys_match_frame(cam.getKey());}
+
     List<Thread> microserviceThreads = new ArrayList<>();
 
     latch = new CountDownLatch(Cameras.size()+3+Lidars.size());
@@ -122,9 +126,7 @@ public class GurionRockRunner {
     for (int i = 0; i < Lidars.size(); i++) {
         microserviceThreads.add(new Thread(new LiDarService(Lidars.get(i),latch)));
     }
-    ErrorInfo.initalize(Cameras.size(), Lidars.size());
-    //sending the keys names to the ErrorInfo
-    for(Camera cam : Cameras){ErrorInfo.getInstance().add_cameras_keys_match_frame(cam.getKey());}
+
 
     for (Thread thread : microserviceThreads) {
         thread.start();

@@ -95,13 +95,13 @@ public class CameraService extends MicroService {
                         }
                     }
                     stat.incrementDetectedObjects(eve.getObjects().size());
-                }
+                
                     Future<Boolean> fut = MessageBusImpl.getInstance().sendEvent(eve);
                     if (fut.get() == false) {
                         sendBroadcast(new CrashedBroadcast(getName(), "Failure occurred while processing DetectObjectsEvent."));
                         //dont sure if its correct to semd crashed here
                     }
-                    
+                }
                 }
             }
         }

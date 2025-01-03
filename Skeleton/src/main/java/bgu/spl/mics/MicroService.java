@@ -171,15 +171,15 @@ public abstract class MicroService implements Runnable {
         Callback<T> callback = (Callback<T>) messageCallBack.get(message.getClass());
         if (callback != null) {
             callback.call((T) message); // Execute the callback
+            // if (message instanceof Event) {
+            //     complete((Event<Boolean>) message, true); // Completing the event
+            // }
         } else {
             throw new IllegalStateException("No callback found for message type: " + message.getClass());
         }
-    }
 
-    /**
-     * The entry point of the micro-service. TODO: you must complete this code
-     * otherwise you will end up in an infinite loop.
-     */
+    }
+    
     @Override
     public final void run() {
         msg_bus.register(this);
@@ -212,9 +212,9 @@ public abstract class MicroService implements Runnable {
             Thread.currentThread().interrupt();
             // terminate();
         }
-        System.out.println(getName() + " terminated: " );
-
     }
+    System.out.println(getName() + " terminated: " );
+
     msg_bus.unregister(this);
     System.out.println("msg_bus unregistered: " + getName());
 
