@@ -95,12 +95,9 @@ public class CameraService extends MicroService {
                             break;
                         }
                     }
-                    if(camera.getStatus() != STATUS.ERROR){
-                        ErrorInfo.getInstance().UpdateCamerasLastFrames(last_frame, camera.getKey());
-                        stat.incrementDetectedObjects(eve.getObjects().size());
-                        System.out.println("Camera sent a DetectObjectsEvent");
-                    }
-                    // Future<Boolean> fut = MessageBusImpl.getInstance().sendEvent(eve);
+                    stat.incrementDetectedObjects(eve.getObjects().size());
+                    System.out.println("Camera sent a DetectObjectsEvent");
+                    Future<Boolean> fut = MessageBusImpl.getInstance().sendEvent(eve);
                     // if (fut.get() == false) {
                     //     sendBroadcast(new CrashedBroadcast(getName(), "Failure occurred while processing DetectObjectsEvent."));
                     //     //dont sure if its correct to semd crashed here
