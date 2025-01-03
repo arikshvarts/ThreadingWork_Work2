@@ -82,6 +82,7 @@ public ArrayList<StampedCloudPoints> two_to_three(ArrayList<lidarData> lidarData
     ArrayList<StampedCloudPoints> lidarData2Pts = new ArrayList<>();
     ArrayList<CloudPoint> cloudPoints = new ArrayList<>();
     for(lidarData data : lidarData3Pts){
+        cloudPoints = new ArrayList<>();
         id=data.getId();
         time=data.getTime();
         for (ArrayList<Double> ls : data.get3pts()){
