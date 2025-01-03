@@ -62,7 +62,7 @@ public class CameraService extends MicroService {
         }
         
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast c) -> {
-        if(c.getCurrentTick() > camera.get_last_detected_time() + camera.getFrequency())   {
+        if(c.getCurrentTick() > last_detected_time + camera.getFrequency())   {
             //stop after last time you detected something + the frequency
             camera.setStatus(STATUS.DOWN);
             ServiceCounter.getInstance().decrementThreads();
@@ -83,9 +83,10 @@ public class CameraService extends MicroService {
                 if(eve.getObjects().isEmpty() == false ) {
                     //update last_frame and send DetectObjectsEvent only if the camera saw something
                     last_frame = eve; // the last time the camera processed the envirmoent, it means, what the camera saw at currTime - frequency 
+                    ErrorInfo.getInstance().UpdateCamerasLastFrames(last_frame, camera.getKey());
                     //send only if frequency delay passed (handeled by handle tick)
                     for(DetectedObject det : eve.getObjects()){
-                        if (det.getId() == "ERROR"){
+                        if (det.getId().equals("ERROR")){
                             camera.setStatus(STATUS.ERROR);
                             sendBroadcast(new CrashedBroadcast(det.getId(), "this item is error"));
                             ServiceCounter.getInstance().decrementThreads();
@@ -94,13 +95,16 @@ public class CameraService extends MicroService {
                             break;
                         }
                     }
-                    stat.incrementDetectedObjects(eve.getObjects().size());
-                
-                    Future<Boolean> fut = MessageBusImpl.getInstance().sendEvent(eve);
-                    if (fut.get() == false) {
-                        sendBroadcast(new CrashedBroadcast(getName(), "Failure occurred while processing DetectObjectsEvent."));
-                        //dont sure if its correct to semd crashed here
+                    if(camera.getStatus() != STATUS.ERROR){
+                        ErrorInfo.getInstance().UpdateCamerasLastFrames(last_frame, camera.getKey());
+                        stat.incrementDetectedObjects(eve.getObjects().size());
+                        System.out.println("Camera sent a DetectObjectsEvent");
                     }
+                    // Future<Boolean> fut = MessageBusImpl.getInstance().sendEvent(eve);
+                    // if (fut.get() == false) {
+                    //     sendBroadcast(new CrashedBroadcast(getName(), "Failure occurred while processing DetectObjectsEvent."));
+                    //     //dont sure if its correct to semd crashed here
+                    // }
                 }
                 }
             }
