@@ -65,8 +65,8 @@ public class LiDarService extends MicroService {
 
 
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast c) -> {
-            if(c.getCurrentTick() > last_detected_time + liDarTracker.getFrequency())   {
-            //stop after last time you detected something + the frequency
+            if(c.getCurrentTick() > last_detected_time + liDarTracker.getFrequency() && events_to_send.isEmpty()==true)   {
+            //stop after last time you detected something + the frequency and haa nothing more to send (that may be after last T+F because of camera F)
             liDarTracker.setStatus(STATUS.DOWN);
             ServiceCounter.getInstance().decrementThreads();
                 terminate();
