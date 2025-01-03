@@ -64,7 +64,7 @@ public class LiDarWorkerTracker {
                     setStatus(STATUS.ERROR);
                     break;
                 }
-                if(obj.getId() == tracked.getId()){
+                if(obj.getId().equals(tracked.getId())){
                     trackedObjects.add(new TrackedObject(tracked.getId(), obj.getDescription(), tracked.getCloudPoints(), det.getTime()));
                 }
             }
