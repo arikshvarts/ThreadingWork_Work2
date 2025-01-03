@@ -59,12 +59,12 @@ public class LiDarWorkerTracker {
         for(StampedCloudPoints tracked : objects_at_time){
             //need to continue and find from all tracked in this time in the hash, only yhe objects detected from camera
             for(DetectedObject obj : det.getObjects()){
-                if(tracked.getId() == "ERROR"){
+                if(tracked.getId().equals("ERROR")){
                     //if tracked object with id = ERROR
                     setStatus(STATUS.ERROR);
                     break;
                 }
-                if(obj.getId() == tracked.getId()){
+                if(obj.getId().equals(tracked.getId())){
                     trackedObjects.add(new TrackedObject(tracked.getId(), obj.getDescription(), tracked.getCloudPoints(), det.getTime()));
                 }
             }
