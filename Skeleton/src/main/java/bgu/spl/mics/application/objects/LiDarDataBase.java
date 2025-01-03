@@ -14,7 +14,6 @@ import com.google.gson.reflect.TypeToken;
  * It provides access to cloud point data and other relevant information for tracked objects.
  */
 public class LiDarDataBase {
-    private static LiDarDataBase instance;
     private  ArrayList<StampedCloudPoints> cloudPoints;
     //each key in this map is time and value is list of all StampedCloudPoints with the key time
     private static ConcurrentHashMap<Integer, ArrayList<StampedCloudPoints>> map_time_cloudP = new ConcurrentHashMap<>();
@@ -22,9 +21,13 @@ public class LiDarDataBase {
 
     public void initialize(ArrayList<StampedCloudPoints> data) {
         cloudPoints = data;
-        for (StampedCloudPoints point : cloudPoints) {
+        for (StampedCloudPoints obj : cloudPoints) {
             //updating all the values to our map
-            map_time_cloudP.computeIfAbsent(point.getTime(), k -> new ArrayList<>()).add(point);
+            // map_time_cloudP.computeIfAbsent(point.getTime(), k -> new ArrayList<>()).add(point);
+            if(map_time_cloudP.get(obj.getTime()) == null){
+                map_time_cloudP.put(obj.getTime(), new ArrayList<StampedCloudPoints>());
+            }
+            map_time_cloudP.get(obj.getTime()).add(obj);
         }    
     }
     
