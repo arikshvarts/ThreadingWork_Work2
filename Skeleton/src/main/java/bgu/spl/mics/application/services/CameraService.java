@@ -83,7 +83,6 @@ public class CameraService extends MicroService {
                 if(eve.getObjects().isEmpty() == false ) {
                     //update last_frame and send DetectObjectsEvent only if the camera saw something
                     last_frame = eve; // the last time the camera processed the envirmoent, it means, what the camera saw at currTime - frequency 
-                    ErrorInfo.getInstance().UpdateCamerasLastFrames(last_frame, camera.getKey());
                     //send only if frequency delay passed (handeled by handle tick)
                     for(DetectedObject det : eve.getObjects()){
                         if (det.getId().equals("ERROR")){
@@ -92,9 +91,10 @@ public class CameraService extends MicroService {
                             ServiceCounter.getInstance().decrementThreads();
 
                             terminate();
-                            break;
+                            return;
                         }
                     }
+                    ErrorInfo.getInstance().UpdateCamerasLastFrames(last_frame, camera.getKey());
                     stat.incrementDetectedObjects(eve.getObjects().size());
                     System.out.println("Camera sent a DetectObjectsEvent");
                     Future<Boolean> fut = MessageBusImpl.getInstance().sendEvent(eve);
