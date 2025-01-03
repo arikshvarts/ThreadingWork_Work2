@@ -201,7 +201,7 @@ public void createOutput() {
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     // Write to JSON file with proper indentation
-    try (FileWriter file = new FileWriter("err_output_testing.json")) {
+    try (FileWriter file = new FileWriter("err_output.json")) {
         gson.toJson(outputJson, file);  // This will automatically add line breaks and indentation
         file.flush();
     } catch (IOException e) {
