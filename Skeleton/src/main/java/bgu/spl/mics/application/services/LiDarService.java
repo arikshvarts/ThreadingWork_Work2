@@ -66,6 +66,8 @@ public class LiDarService extends MicroService {
 
 
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast c) -> {
+            System.out.println("lidar service"+liDarTracker.getId()+ "got a tick ");
+
             if(c.getCurrentTick() > last_detected_time + liDarTracker.getFrequency() && events_to_send.isEmpty()==true)   {
             //stop after last time you detected something + the frequency and haa nothing more to send (that may be after last T+F because of camera F)
             liDarTracker.setStatus(STATUS.DOWN);
@@ -74,11 +76,17 @@ public class LiDarService extends MicroService {
             }
             else{
                 if(liDarTracker.getStatus() == STATUS.UP){
+                    System.out.println("before synch");
+
                     synchronized (events_to_send) {
+                        System.out.println("after synch");
+
                         Iterator<TrackedObjectsEvent> iterator = events_to_send.iterator();
                         while (iterator.hasNext()) {
                             TrackedObjectsEvent eve = iterator.next();
+                            System.out.println("iteratorLidar Moving");
                             if (c.getCurrentTick() >= eve.getTime() + liDarTracker.getFrequency()) {
+                                System.out.println("LiDarService: sending TrackedObjectsEvent");
                                 stat.incrementTrackedObjects(eve.getTrackedObjects().size());
                                 last_frame = eve;
                                 ErrorInfo.getInstance().UpdateLidarsLastFrames(last_frame, liDarTracker.getId());

@@ -53,6 +53,7 @@ public class TimeService extends MicroService {
         {
             sendBroadcast(new TickBroadcast(currentTick));
             currentTick++;
+            System.out.println("TimeService: Tick " + currentTick);
             StatisticalFolder.getInstance().updateRuntime(1);
             try {
                 // Simulate the passage of time for this tick
