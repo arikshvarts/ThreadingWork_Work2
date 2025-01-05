@@ -11,6 +11,7 @@ import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.objects.GPSIMU;
 import bgu.spl.mics.application.objects.Pose;
+import bgu.spl.mics.application.objects.StatisticalFolder;
 
 /**
  * PoseService is responsible for maintaining the robot's current pose (position and orientation)
@@ -19,6 +20,9 @@ import bgu.spl.mics.application.objects.Pose;
 public class PoseService extends MicroService {
     GPSIMU gpsimu=null;
     ArrayList<Pose> kol_haposot; //the Array of all the poses for use in the ErrorInfo
+    private StatisticalFolder stat;
+
+
     /**
      * Constructor for PoseService.
      *
@@ -28,6 +32,8 @@ public class PoseService extends MicroService {
         super("PoseService",latch);
         this.gpsimu=gpsimu;
         this.kol_haposot = new ArrayList<>();    
+        this.stat = StatisticalFolder.getInstance();
+        stat.incrementNumSensors();
     }
 
     /**

@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
         public AtomicInteger numDetectedObjects;
         public AtomicInteger numTrackedObjects;
         public AtomicInteger numLandmarks;
+        public AtomicInteger numSensors;
 
 
 
@@ -20,6 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
             numDetectedObjects=new AtomicInteger(0);
             numTrackedObjects=new AtomicInteger(0);
             numLandmarks=new AtomicInteger(0);
+            numSensors=new AtomicInteger(0);
+            
         }
         
     // Singleton instance    
@@ -45,8 +48,20 @@ import java.util.concurrent.atomic.AtomicInteger;
         public void incrementLandmarks(int add) {
             this.numLandmarks.addAndGet(add);
         }
+
+        public void incrementNumSensors() {
+            this.numTrackedObjects.addAndGet(1);
+        }
+    
+        public void decrementNumSensors() {
+            this.numLandmarks.addAndGet(-1);
+        }
     
         // Getters
+        public AtomicInteger getNUmSensors() {
+            return systemRuntime;
+        }
+
         public AtomicInteger getSystemRuntime() {
             return systemRuntime;
         }

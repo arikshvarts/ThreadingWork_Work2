@@ -27,6 +27,7 @@ import bgu.spl.mics.application.objects.TrackedObject;
  */
 public class FusionSlamService extends MicroService {
     private FusionSlam fusionSlam;
+    private StatisticalFolder stat;
 
     /**
      * Constructor for FusionSlamService.
@@ -36,6 +37,7 @@ public class FusionSlamService extends MicroService {
     public FusionSlamService(FusionSlam FusionSlam,CountDownLatch latch) {
         super("fusionSlam",latch);
         this.fusionSlam = FusionSlam;
+        this.stat = StatisticalFolder.getInstance();
     }
 
     /**
@@ -69,11 +71,18 @@ public class FusionSlamService extends MicroService {
 
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast) ->
         {
+            stat.decrementNumSensors();
             if (TerminatedBroadcast.getSender().equals("TimeService")) {
                 terminate();
                 fusionSlam.createOutput();
             }
-            else if (ServiceCounter.getInstance().getNumThreads() ==  2){
+            // else if (ServiceCounter.getInstance().getNumThreads() ==  2){
+            //     //it means all the microservices are terminated except Fusion and Time
+            // fusionSlam.createOutput();
+            // terminate();
+            // sendBroadcast(new TerminatedBroadcast("FusionSlam"));
+            // }
+            else if (stat.getNUmSensors().get() ==  0){ //cast the atomicInteger to int
                 //it means all the microservices are terminated except Fusion and Time
             fusionSlam.createOutput();
             terminate();

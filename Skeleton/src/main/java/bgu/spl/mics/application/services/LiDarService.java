@@ -43,6 +43,7 @@ public class LiDarService extends MicroService {
         this.liDarTracker = liDarTracker;
         this.stat = StatisticalFolder.getInstance();
         this.last_frame = new TrackedObjectsEvent(new ArrayList<TrackedObject>(), 0);
+        stat.incrementNumSensors();
 
 
     }
