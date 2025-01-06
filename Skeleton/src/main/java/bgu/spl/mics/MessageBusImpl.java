@@ -9,10 +9,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 
 import bgu.spl.mics.application.messages.DetectObjectsEvent;
+import bgu.spl.mics.application.objects.StatisticalFolder;
 public class MessageBusImpl implements MessageBus {
     
         private final ConcurrentHashMap<MicroService, BlockingQueue<Message>> MicroServices_Queues = new ConcurrentHashMap<>();
-        private final ConcurrentHashMap<Class<? extends Broadcast>, ArrayList<MicroService>> broadcast_Subscribers = new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<Class<? extends Broadcast>, CopyOnWriteArrayList<MicroService>> broadcast_Subscribers = new ConcurrentHashMap<>();
         private final ConcurrentHashMap<Class<? extends Event>, BlockingQueue<MicroService>> event_Subscribers = new ConcurrentHashMap<>();
         private final ConcurrentHashMap<Event<?>, Future<?>> FutureToEvent = new ConcurrentHashMap<>();
         private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
@@ -38,7 +39,7 @@ public class MessageBusImpl implements MessageBus {
         @Override
         public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
 
-                broadcast_Subscribers.computeIfAbsent(type, k -> new ArrayList<>()).add(m);
+                broadcast_Subscribers.computeIfAbsent(type, k -> new CopyOnWriteArrayList<>()).add(m);
         }
     
         @Override
