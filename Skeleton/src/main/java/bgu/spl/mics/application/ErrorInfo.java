@@ -191,7 +191,8 @@ public void createOutput() {
 
     // Add statistics
     JsonObject statistics = new JsonObject();
-    statistics.addProperty("systemRuntime", stat.getSystemRuntime());
+    // stat.setSystemRuntime(stat.getSystemRuntime().decrementAndGet());
+    statistics.addProperty("systemRuntime", stat.getSystemRuntime().decrementAndGet());
     statistics.addProperty("numDetectedObjects", stat.getNumDetectedObjects());
     statistics.addProperty("numTrackedObjects", stat.getNumTrackedObjects());
     statistics.addProperty("numLandmarks", stat.getNumLandmarks());
