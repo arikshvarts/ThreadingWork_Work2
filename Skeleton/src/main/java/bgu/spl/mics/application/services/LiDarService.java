@@ -43,6 +43,7 @@ public class LiDarService extends MicroService {
         this.liDarTracker = liDarTracker;
         this.stat = StatisticalFolder.getInstance();
         this.last_frame = new TrackedObjectsEvent(new ArrayList<TrackedObject>(), 0);
+        stat.incrementNumSensors();
 
 
     }
@@ -67,14 +68,11 @@ public class LiDarService extends MicroService {
 
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast c) -> {
             System.out.println("lidar service"+liDarTracker.getId()+ "got a tick ");
-
-            if(c.getCurrentTick() > last_detected_time + liDarTracker.getFrequency() && events_to_send.isEmpty()==true)   {
-            //stop after last time you detected something + the frequency and haa nothing more to send (that may be after last T+F because of camera F)
-            liDarTracker.setStatus(STATUS.DOWN);
-            ServiceCounter.getInstance().decrementThreads();
-                terminate();
+            if(c.getCurrentTick()==21){
+                System.out.println(",");
             }
-            else{
+      
+            // else{
                 if(liDarTracker.getStatus() == STATUS.UP){
                     System.out.println("before synch");
 
@@ -96,7 +94,14 @@ public class LiDarService extends MicroService {
                         }
                     }
                 }
-            }
+            // }
+            if(c.getCurrentTick() > last_detected_time + liDarTracker.getFrequency() && events_to_send.isEmpty()==true)   {
+                //stop after last time you detected something + the frequency and haa nothing more to send (that may be after last T+F because of camera F)
+                liDarTracker.setStatus(STATUS.DOWN);
+                ServiceCounter.getInstance().decrementThreads();
+                    terminate();
+                    sendBroadcast(new TerminatedBroadcast(getName()));
+                }
         });
 
 
