@@ -110,8 +110,5 @@ import java.util.concurrent.atomic.AtomicInteger;
         public AtomicInteger getNumLandmarks() {
             return numLandmarks;
         }
-        public void setSystemRuntime(AtomicInteger systemRuntime) {
-            this.systemRuntime = systemRuntime;
-        }
     }
     

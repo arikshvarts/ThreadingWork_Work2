@@ -87,9 +87,7 @@ public class Camera {
             //send only if frequency delay passed
             if (data.getTime() == currTime - frequency) {
                     
-                // return new DetectObjectsEvent(currTime, data.getDetectedObjects());
                 return new DetectObjectsEvent(data.getTime(), data.getDetectedObjects());
-
             }
             // Return an empty List if there are no objects that detected at this time
         }
