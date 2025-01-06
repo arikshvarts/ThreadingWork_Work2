@@ -241,7 +241,6 @@ public void createOutput() {
     }
     outputJson.add("lastCamerasFrame", lastCamerasFrame);
 
-    // ✅ Modified lastLidarsFrame according to your instructions
     JsonObject lastLiDarWorkerTrackersFrame = new JsonObject();
     int lidarIndex = 1; // To track Lidar IDs
     for (TrackedObjectsEvent event : lidars_last_frames) {
