@@ -67,7 +67,7 @@ public class CameraService extends MicroService {
             //stop after last time you detected something + the frequency
             camera.setStatus(STATUS.DOWN);
             ServiceCounter.getInstance().decrementThreads();
-
+                sendBroadcast(new TerminatedBroadcast(getName()));
                 terminate();
         }
         else{

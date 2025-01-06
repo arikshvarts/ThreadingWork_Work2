@@ -36,6 +36,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
         public void updateRuntime(int add) {//synchronized maybe?
             this.systemRuntime.addAndGet(add);        }
+        //     public void updateRuntime(int add) {//synchronized maybe?
+        //     int oldVal;
+        //     int newVal;
+        //     do{
+        //         oldVal = systemRuntime.get();
+        //         newVal = oldVal + 1;
+        //     }
+        //     while(!systemRuntime.compareAndSet(oldVal, newVal));
+        // }
     
         public void incrementDetectedObjects(int add) {
             this.numDetectedObjects.addAndGet(add);
@@ -50,16 +59,40 @@ import java.util.concurrent.atomic.AtomicInteger;
         }
 
         public void incrementNumSensors() {
-            this.numTrackedObjects.addAndGet(1);
+            numSensors.addAndGet(1);
+            System.out.println("num of sensorsssssssssssssssssssssssssssssssssssssssssssssss  "+ numSensors);
         }
+        // public void incrementNumSensors() {
+        //     int oldVal;
+        //     int newVal;
+        //     do{
+        //         oldVal = numSensors.get();
+        //         newVal = oldVal + 1;
+        //     }
+        //     while(!numSensors.compareAndSet(oldVal, newVal));
+        // }
     
+        // public void decrementNumSensors() {
+        //     this.numLandmarks.addAndGet(-1);
+        // }
         public void decrementNumSensors() {
-            this.numLandmarks.addAndGet(-1);
+            // int oldVal;
+            // int newVal;
+            // do{
+            //     oldVal = numSensors.get();
+            //     newVal = oldVal -1;
+            //     System.out.println("num of sensorsssssssssssssssssssssssssssssssssssssssssssssss  "+ newVal );
+
+            // }
+            // while(!numSensors.compareAndSet(oldVal, newVal));
+            numSensors.decrementAndGet();
+            System.out.println("num of sensorsssssssssssssssssssssssssssssssssssssssssssssss  "+ numSensors);
+
         }
     
         // Getters
-        public AtomicInteger getNUmSensors() {
-            return systemRuntime;
+        public AtomicInteger getNumSensors() {
+            return numSensors;
         }
 
         public AtomicInteger getSystemRuntime() {

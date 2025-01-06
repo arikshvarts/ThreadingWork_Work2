@@ -72,6 +72,7 @@ public class FusionSlamService extends MicroService {
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast) ->
         {
             stat.decrementNumSensors();
+            int sensorCount = stat.getNumSensors().get();
             if (TerminatedBroadcast.getSender().equals("TimeService")) {
                 terminate();
                 fusionSlam.createOutput();
@@ -82,15 +83,18 @@ public class FusionSlamService extends MicroService {
             // terminate();
             // sendBroadcast(new TerminatedBroadcast("FusionSlam"));
             // }
-            else if (stat.getNUmSensors().get() ==  0){ //cast the atomicInteger to int
+            else if (sensorCount ==  0){ //cast the atomicInteger to int
                 //it means all the microservices are terminated except Fusion and Time
             fusionSlam.createOutput();
             terminate();
             sendBroadcast(new TerminatedBroadcast("FusionSlam"));
             }
         });
-        subscribeBroadcast(TickBroadcast.class, (TerminatedBroadcast) ->
+        subscribeBroadcast(TickBroadcast.class, (TickBroadcast) ->
         {
+            if(TickBroadcast.getCurrentTick()== 21){
+                System.out.println("p");
+            }
         });
     }
         
