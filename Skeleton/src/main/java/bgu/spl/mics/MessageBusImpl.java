@@ -120,6 +120,10 @@ public class MessageBusImpl implements MessageBus {
                 rwLock.writeLock().unlock();
             }
         }
+        
+        public Boolean isRegistered(MicroService m){
+            return(MicroServices_Queues.containsKey(m));
+        }
     
         @Override
         public Message awaitMessage(MicroService m) throws InterruptedException {
