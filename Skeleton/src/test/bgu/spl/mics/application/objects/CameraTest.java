@@ -3,7 +3,14 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 
 public class CameraTest {
+//method under test - handleTick.
 
+//The pre conditions, post conditions and invariants are in the camera class above handleTick method
+
+//this 2 invariant kept during the tests
+// The internal `CameraData` list should remain unchanged after the method call.
+ // The method should not modify the `frequency` or `status` fields.
+    
     @Test
     public void testHandleTick_ValidEvent() {
         // Arrange

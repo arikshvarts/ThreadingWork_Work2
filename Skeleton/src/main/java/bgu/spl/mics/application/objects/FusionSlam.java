@@ -50,6 +50,24 @@ public class FusionSlam {
         return FusionSlamHolder.instance;
     }
   
+    /**
+ * Adds a new landmark or updates an existing one based on the given `TrackedObject`.
+ *
+ * Preconditions:
+ * - The `trackedObject` parameter must not be null.
+ * - The `trackedObject` must have a valid `id`, `description`, and a non-empty list of coordinates.
+ *
+ * Postconditions:
+ * - If a landmark with the same ID already exists, its coordinates are updated using an average calculation.
+ * - If no matching landmark exists and pose data is available, a new landmark is added.
+ * - If no matching landmark exists and pose data is missing, the object is added to the `waitingObjs` list for later processing.
+ *
+ * Invariants:
+ * - The `landmarks` list must not contain duplicate landmarks with the same ID.
+ * - The size of the `landmarks` list should only increase when a new landmark is added.
+ * - The `waitingObjs` list should only grow if pose data is unavailable for the tracked object.
+ */
+
        public void addOrUpdateLandMark(TrackedObject trackedObject) {
         LandMark existingLandMark = landMarkExist(trackedObject);
         if (existingLandMark == null) { //in case the LandMark doesn't exist.
@@ -87,6 +105,23 @@ public class FusionSlam {
         }
         return null;
     }
+
+    /**
+ * Translates the local coordinates of a `TrackedObject` into global coordinates based on its timestamp and pose.
+ *
+ * Preconditions:
+ * - The `trackedObject` parameter must not be null.
+ * - The `trackedObject` must have a valid `time` field and at least one coordinate point.
+ * - The `poses` list must contain at least one `Pose` object matching the tracked object's time.
+ *
+ * Postconditions:
+ * - If a corresponding `Pose` exists, a new list of global `CloudPoint` coordinates is returned.
+ * - If no matching `Pose` is found, the method returns `null`.
+ *
+ * Invariants:
+ * - The `poses` and `trackedObject` data must remain unchanged after this method executes.
+ * - The returned list of global coordinates, if not null, should match the size of the input coordinate list.
+ */
 
     public ArrayList<CloudPoint> translateCoordinateSys(TrackedObject trackedObject) {
 

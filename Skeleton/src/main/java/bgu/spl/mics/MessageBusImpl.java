@@ -52,6 +52,21 @@ public class MessageBusImpl implements MessageBus {
                 }
             } 
         
+            /**
+ * Sends a broadcast message to all microservices subscribed to the broadcast type.
+ *
+ * Preconditions:
+ * - `b` must be a non-null instance of a `Broadcast` message.
+ * - There must be at least one microservice subscribed to the broadcast type.
+ *
+ * Postconditions:
+ * - All registered microservices subscribed to the broadcast type receive the broadcast message.
+ * - If no microservices are subscribed, no messages are sent.
+ *
+ * Invariants:
+ * - A broadcast message is **not stored** and is only delivered to currently subscribed services.
+ * - The integrity of the `broadcast_Subscribers` collection must remain consistent during delivery.
+ */
     
         @Override
         public void sendBroadcast(Broadcast b) {
@@ -103,12 +118,45 @@ public class MessageBusImpl implements MessageBus {
             return null;
         }
     
+        /**
+ * Registers a new microservice in the message bus by allocating a message queue for it.
+ *
+ * Preconditions:
+ * - `m` must be a non-null instance of `MicroService`.
+ * - The microservice should not already be registered.
+ *
+ * Postconditions:
+ * - A new message queue is created and associated with the microservice in `MicroServices_Queues`.
+ * - No duplicate message queues should exist for the same microservice.
+ *
+ * Invariants:
+ * - Each microservice should have exactly **one** message queue associated with it in `MicroServices_Queues`.
+ * - No message queue should be shared between multiple microservices.
+ */
+
         @Override
         public void register(MicroService m) {
                 MicroServices_Queues.putIfAbsent(m, new LinkedBlockingQueue<>());
 
         }
     
+/**
+ * Unregisters a microservice by removing its message queue and cleaning references from all subscriptions.
+ *
+ * Preconditions:
+ * - `m` must be a non-null instance of `MicroService`.
+ * - The microservice must be registered prior to calling this method.
+ *
+ * Postconditions:
+ * - The microservice's message queue is removed from `MicroServices_Queues`.
+ * - The microservice is removed from all `broadcast_Subscribers` and `event_Subscribers`.
+ * - If the microservice was not registered, no actions are performed.
+ *
+ * Invariants:
+ * - After the call, the microservice should no longer receive any messages or broadcasts.
+ * - If a microservice is re-registered, a new queue must be created without using the old one.
+ */
+
         @Override
         public void unregister(MicroService m) {
             rwLock.writeLock().lock();
@@ -120,6 +168,10 @@ public class MessageBusImpl implements MessageBus {
                 rwLock.writeLock().unlock();
             }
         }
+        
+        public Boolean isRegistered(MicroService m){
+            return(MicroServices_Queues.containsKey(m));
+        }
     
         @Override
         public Message awaitMessage(MicroService m) throws InterruptedException {
@@ -128,6 +180,10 @@ public class MessageBusImpl implements MessageBus {
                     throw new IllegalStateException("This MicroService is not registered");
                 }
                 return queue.take();
+        }
+
+        public int getnumListeners(Class<? extends Message> type) {
+            return event_Subscribers.get(type).size();
         }
     }
     
