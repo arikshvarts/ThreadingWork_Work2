@@ -82,6 +82,25 @@ public class Camera {
         return last_detected_time;
     }
 
+
+/**
+ * Handles the detection of objects at the current time based on the camera's frequency.
+ *
+ * Preconditions:
+ * - `currTime` must be a non-negative integer representing the current simulation time.
+ * - The `CameraData` list must be initialized and populated with valid `StampedDetectedObjects`.
+ * - The frequency should be a positive integer.
+ *
+ * Postconditions:
+ * - If the current time matches the camera's detection frequency, a `DetectObjectsEvent` will be returned 
+ *   with the detected objects and the event time matching the detection time.
+ * - If no objects are detected at the current tick, an empty `DetectObjectsEvent` will be returned.
+ *
+ * Invariants:
+ * - The internal `CameraData` list should remain unchanged after the method call.
+ * - The method should not modify the `frequency` or `status` fields.
+ */
+
     public DetectObjectsEvent handleTick(int currTime) {
         for (StampedDetectedObjects data : CameraData) {
             //send only if frequency delay passed
