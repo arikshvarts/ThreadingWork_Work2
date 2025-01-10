@@ -62,10 +62,7 @@ public class GurionRockRunner {
     ArrayList<Pose> PoseData=null;
 
     try {
-        // parsingJsonFiles = new ParsingJsonFiles("C:\\Users\\ariks\\uni\\CodingEnviroments\\Work2_Threading\\Skeleton\\example input\\configuration_file.json");
-        // parsingJsonFiles = new ParsingJsonFiles("C:\\Users\\עדו רבין\\OneDrive\\מסמכים\\GitHub\\ThreadingWork_Work2\\Skeleton\\example input\\configuration_file.json");
-        // parsingJsonFiles = new ParsingJsonFiles("C:\\Users\\עדו רבין\\OneDrive\\מסמכים\\GitHub\\ThreadingWork_Work2\\Skeleton\\example_input_with_error\\configuration_file.json");
-        parsingJsonFiles = new ParsingJsonFiles("C:\\Users\\עדו רבין\\OneDrive\\מסמכים\\GitHub\\ThreadingWork_Work2\\Skeleton\\example_input_2\\configuration_file.json");
+        parsingJsonFiles = new ParsingJsonFiles(args[0]);
         System.err.println("Done parsing");
     
     
